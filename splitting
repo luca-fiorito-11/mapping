@@ -1,0 +1,5 @@
+#!/bin/bash
+
+FILE="$1"
+REGEX="^.\{74\}0.\{5\}$"
+csplit "${FILE}" /"${REGEX}"/ {*} --suppress-matched -z
