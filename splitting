@@ -1,12 +1,108 @@
 #!/bin/bash
+#===============================================================================
+#
+# FILE: splitting
+#
+# USAGE:
+#
+# DESCRIPTION: Split ENDF-6 file into chunks.
+#
+# OPTIONS: see function ’usage’ below
+# REQUIREMENTS: ---
+# BUGS: ---
+# NOTES: ---
+# AUTHOR: Luca Fiorito, luca.fiorito@oecd.org
+# COMPANY: OECD/NEA
+# VERSION: ---
+# CREATED: 26.01.2018
+# REVISION: ---
+#===============================================================================
 
-set -e
-FILE="$1"
+USAGE="Usage:
+
+$CODE  FILE  [options]
+
+
+POSITIONAL ARGUMENTS
+--------------------
+
+FILE                        input ENDF-6 file.
+
+
+KEYWORD ARGUMENTS
+-----------------
+
+-h|--help                   Print the help text.
+"
+
+
+
+#######################################################################
+#######################################################################
+#                                                                     #
+#                    PARSE COMMAND LINE ARGUMENTS                     #
+#                                                                     #
+#######################################################################
+#######################################################################
+POSITIONAL=()
+while [[ $# -gt 0 ]]
+do
+key="$1"
+case $key in
+    -h|--help) # print USAGE and exit with status 0
+    echo -e "$USAGE"
+    exit 0
+    ;;
+    -t|--target-directory)
+    TWD="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+esac
+done
+
+
+
+#######################################################################
+#######################################################################
+#                                                                     #
+#                          PROCESS INPUTS                             #
+#                                                                     #
+#######################################################################
+#######################################################################
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Get FILE from positional arguments.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+msg="ERROR: missing positional argument \"FILE\".\n$USAGE"
+[[ ${#POSITIONAL[@]} -lt 1 ]] && { >&2 echo -e "$msg"; exit 1; }
+FILE="$( realpath ${POSITIONAL[0]})"
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Set target working directory
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TWD="${TWD:-$(pwd)}"
+[[ -d "$TWD" ]] ||  { >&2 echo -e "ERROR: no existing directory called '$TWD'"; exit 1; }
+
+
+
+#######################################################################
+#######################################################################
+#                                                                     #
+#                        DO THE SPLITTING                             #
+#                                                                     #
+#######################################################################
+#######################################################################
 REGEX="^.\{74\}0.\{5\}$"
+(
+cd "$TWD" &&
 csplit "${FILE}" /"${REGEX}"/ {*} --suppress-matched -z --quiet
 for file in $(find . -maxdepth 1 -type f -name "xx*")
 do
    CHUNK="$(head -1 "$file" | cut -c67-75 | tr ' ' 0)"
    [[ -z $CHUNK || ${#CHUNK} -ne 9 ]] && CHUNK="$(sed -n '2,2 p' "$file" | cut -c67-75 | tr ' ' 0)"
-   mv "$file" "$CHUNK"
+   mv "$file" "$TWD/$CHUNK"
 done
+)
