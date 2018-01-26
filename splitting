@@ -1,55 +1,12 @@
 #!/bin/bash
 
-getMAT () {
-#=== FUNCTION =========================================================
-# NAME: get_mat
-# DESCRIPTION: Find in the ENDF-6 file the MAT number.
-#              Use the sequence number (between 67-80 columns) in the
-#              second line.
-#              Use xargs to trim the leading blankspaces in case the
-#              MAT is only 3 digits.
-# PARAMETER 1: ENDF-6 filename
-#======================================================================
-MAT=$(sed -n '1,1 p' "$1" | cut -c67-70 | xargs)
-printf "%04d" $MAT
-}
-
-getMF () {
-#=== FUNCTION =========================================================
-# NAME: get_mat
-# DESCRIPTION: Find in the ENDF-6 file the MAT number.
-#              Use the sequence number (between 67-80 columns) in the
-#              second line.
-#              Use xargs to trim the leading blankspaces in case the
-#              MAT is only 3 digits.
-# PARAMETER 1: ENDF-6 filename
-#======================================================================
-MF=$(sed -n '1,1 p' "$1" | cut -c71-72 | xargs)
-printf "%02d" $MF
-}
-
-getMT () {
-#=== FUNCTION =========================================================
-# NAME: get_mat
-# DESCRIPTION: Find in the ENDF-6 file the MAT number.
-#              Use the sequence number (between 67-80 columns) in the
-#              second line.
-#              Use xargs to trim the leading blankspaces in case the
-#              MAT is only 3 digits.
-# PARAMETER 1: ENDF-6 filename
-#======================================================================
-MT=$(sed -n '1,1 p' "$1" | cut -c73-75 | xargs)
-printf "%03d" $MT
-}
-
+set -e
 FILE="$1"
 REGEX="^.\{74\}0.\{5\}$"
 csplit "${FILE}" /"${REGEX}"/ {*} --suppress-matched -z --quiet
 for file in $(find . -maxdepth 1 -type f -name "xx*")
 do
-   MAT=$(getMAT $file)
-   MF=$(getMF $file)
-   MT=$(getMT $file)
-   CHUNK="$MAT$MF$MT"
+   CHUNK="$(head -1 "$file" | cut -c67-75 | tr ' ' 0)"
+   [[ -z $CHUNK || ${#CHUNK} -ne 9 ]] && CHUNK="$(sed -n '2,2 p' "$file" | cut -c67-75 | tr ' ' 0)"
    mv "$file" "$CHUNK"
 done
