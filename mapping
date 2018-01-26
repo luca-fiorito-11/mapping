@@ -1,4 +1,22 @@
 #!/bin/bash
+#===============================================================================
+#
+# FILE: mapping
+#
+# USAGE: 
+#
+# DESCRIPTION: Compare given ENDF-6 chunk file to previouos library versions
+#
+# OPTIONS: see function ’usage’ below
+# REQUIREMENTS: ---
+# BUGS: ---
+# NOTES: ---
+# AUTHOR: Luca Fiorito, luca.fiorito@oecd.org
+# COMPANY: OECD/NEA
+# VERSION: ---
+# CREATED: 26.01.2018
+# REVISION: ---
+#===============================================================================
 
 MAT=$(echo "$FILE" | cut -c1-4)
 MF=$(echo "$FILE" | cut -c5-6)
