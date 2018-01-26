@@ -18,6 +18,8 @@
 # REVISION: ---
 #===============================================================================
 
+CODE=$(basename "$0")                                           # Executable name
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"   # Directory of this script
 USAGE="Usage:
 
 $CODE  FILE  [options]
@@ -87,6 +89,22 @@ TWD="${TWD:-$(pwd)}"
 [[ -d "$TWD" ]] ||  { >&2 echo -e "ERROR: no existing directory called '$TWD'"; exit 1; }
 
 
+#######################################################################
+#######################################################################
+#                                                                     #
+#                        STANDARDIZE                                  #
+#                                                                     #
+#######################################################################
+#######################################################################
+ENDF2C="${SCRIPTDIR}/data/codes/endf2c"
+{
+cd $TWD &&
+ln -sf "$FILE" ENDFB.IN
+"$ENDF2C" >/dev/null 2>&1
+EXIT_STATUS=$?
+[[ "$EXIT_STATUS" -ne "0" ]] && { >&2 echo -e "ERROR: File '$FILE' not in ENDF-6 format"; exit 1; }
+}
+
 
 #######################################################################
 #######################################################################
@@ -96,13 +114,14 @@ TWD="${TWD:-$(pwd)}"
 #######################################################################
 #######################################################################
 REGEX="^.\{74\}0.\{5\}$"
-(
+{
 cd "$TWD" &&
-csplit "${FILE}" /"${REGEX}"/ {*} --suppress-matched -z --quiet
+csplit ENDFB.OUT /"${REGEX}"/ {*} --suppress-matched -z --quiet
 for file in $(find . -maxdepth 1 -type f -name "xx*")
 do
    CHUNK="$(head -1 "$file" | cut -c67-75 | tr ' ' 0)"
    [[ -z $CHUNK || ${#CHUNK} -ne 9 ]] && CHUNK="$(sed -n '2,2 p' "$file" | cut -c67-75 | tr ' ' 0)"
-   mv "$file" "$TWD/$CHUNK"
+   mv "$file" "$CHUNK"
 done
-)
+rm -r ENDFB.IN ENDFB.OUT ENDF2C.LST
+}
