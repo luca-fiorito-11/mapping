@@ -1,0 +1,12 @@
+#!/bin/bash
+
+MAT=$(echo "$FILE" | cut -c1-4)
+MF=$(echo "$FILE" | cut -c5-6)
+MT=$(echo "$FILE" | cut -c7-9)
+for dir in $(find test/* -type d)
+do
+  OLD="$dir/$FILE"
+  [[ -s $OLD ]] || continue
+  cmp --silent $OLD $FILE && { ORIGIN=$dir; break; }
+done
+printf "%s  ORIGIN  %s\n" "$FILE" "${ORIGIN:-NEW}"
