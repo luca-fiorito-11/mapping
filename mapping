@@ -26,7 +26,10 @@ $CODE  FILE  [options]
 POSITIONAL ARGUMENTS
 --------------------
 
-FILE                        input ENDF-6 file.
+CHUNKLIST                   List 
+
+DIRLIST                     List
+
 
 
 KEYWORD ARGUMENTS
@@ -34,40 +37,7 @@ KEYWORD ARGUMENTS
 
 -h|--help                   Print the help text.
 
---njoy  NJOY                Set the njoy executable in relative/absolute path.
-                            (default is the NJOY2016 exe at NEA)
-
---temp  TEMP                Set the processing temperature TEMP (in K).
-                            only one value is accepted.
-                            (default is TEMP=293.6K)
-
---sig0  NSIG VAL1 ... VALN  Set the dilution factors.
-                            NSIG is the number of sigma0 values that follow
-                            VAL1 to VALN are NSIG sigma0 values.
-                            (default is [1E10 1E4 1E3 1E2 1E1 1E0])
-
---prefix  PREFIX            Set the output prefix PREFIX.
-                            output files are named \"PREFIX.[extension]\".
-                            Prefix must be one word and not contain reserved characters.
-                            (default is MAT number)
-
---covr                      Run NJOY to produce group covariance matrices.
-
--m|--messages               Parse the NJOY output file for warnings and errors.
-                            The messages are reported in a xml file.
-
---route  ROUTE              Replace \"route\" in the xsdir file.
-                            (default is ROUTE=0)
-
---filename  FILENAME        Replace \"filename\" in the xsdir file.
-                            (default is FILENAME=PREFIX.ACE)
-
---keependf                  Save ENDF-6 input in working folder with name
-                            \"PREFIX.ENDF\".
-
---hendf                     Produce HENDF file by replacing MF3 from PENDF
-                            to ENDF.
-                            Use the merger executable from PREPRO-2017.
+-z|--zip                    Perform comparison on zipped files using zcmp.
 "
 
 
@@ -87,6 +57,10 @@ case $key in
     -h|--help) # print USAGE and exit with status 0
     echo -e "$USAGE"
     exit 0
+    ;;
+    -z|--zip)
+    ZIP="--zip"
+    shift # past argument
     ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
@@ -136,6 +110,11 @@ done
 DIRS=($( awk '{print $1}' $DIRLIST ))
 KEYS=($( awk '{print $2}' $DIRLIST ))
 NDIRS=${#DIRS[@]}
+for DIR in ${DIRS[@]}
+do
+   [[ -d "$DIR" ]] || { >&2 echo -e "ERROR: no directory called '$DIR'"; exit 1; }
+done
+[[ $NDIRS -ne ${#KEYS[@]} ]] && { >&2 echo -e "ERROR: number of directory differs from number of keywords."; exit 1; }
 
 
 
@@ -146,18 +125,22 @@ NDIRS=${#DIRS[@]}
 #                                                                     #
 #######################################################################
 #######################################################################
-#MAT=$(echo "$CHUNK" | cut -c1-4)
-#MF=$(echo "$CHUNK" | cut -c5-6)
-#MT=$(echo "$CHUNK" | cut -c7-9)
-
 for CHUNK in ${CHUNKLIST[@]}
 do
    NAME="$(basename $CHUNK)"
+   MAT=$(echo "$CHUNK" | cut -c1-4)
+   MF=$(echo "$CHUNK" | cut -c5-6)
+   MT=$(echo "$CHUNK" | cut -c7-9)
    for i in $(seq 0 $(($NDIRS-1)))
    do
-      OLD="${DIRS[$i]}/$NAME"
-      [[ -s $OLD ]] || continue 
-      cmp --silent $OLD $CHUNK && { ORIGIN=${KEYS[$i]}; break; }
+      OLD="${DIRS[$i]}/$(basename $CHUNK)"
+      if [[ -s $OLD ]]
+      then
+         [[ -z $ZIP ]] && CMD="cmp" || CMD="zcmp"
+        #    cmp --silent $OLD $CHUNK && { ORIGIN=${KEYS[$i]}; break; }
+         $CMD --silent $OLD $CHUNK && { ORIGIN=${KEYS[$i]}; break; }
+      fi
    done
    printf "%s  ORIGIN  %s\n" "$CHUNK" "${ORIGIN:-NEW}"
+   unset ORIGIN
 done
