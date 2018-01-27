@@ -35,6 +35,10 @@ KEYWORD ARGUMENTS
 -----------------
 
 -h|--help                   Print the help text.
+
+-t|--target-directory       
+
+-z|--zip                    
 "
 
 
@@ -51,19 +55,23 @@ while [[ $# -gt 0 ]]
 do
 key="$1"
 case $key in
-    -h|--help) # print USAGE and exit with status 0
-    echo -e "$USAGE"
-    exit 0
-    ;;
-    -t|--target-directory)
-    TWD="$2"
-    shift # past argument
-    shift # past value
-    ;;
-    *)    # unknown option
-    POSITIONAL+=("$1") # save it in an array for later
-    shift # past argument
-    ;;
+-h|--help) # print USAGE and exit with status 0
+echo -e "$USAGE"
+exit 0
+;;
+-t|--target-directory)
+TWD="$2"
+shift # past argument
+shift # past value
+;;
+-z|--zip)
+ZIP="--zip"
+shift # past argument
+;;
+*)    # unknown option
+POSITIONAL+=("$1") # save it in an array for later
+shift # past argument
+;;
 esac
 done
 
@@ -96,6 +104,8 @@ TWD="${TWD:-$(pwd)}"
 #                                                                     #
 #######################################################################
 #######################################################################
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ENDF2C="${SCRIPTDIR}/data/codes/endf2c"
 {
 cd $TWD &&
@@ -113,15 +123,18 @@ EXIT_STATUS=$?
 #                                                                     #
 #######################################################################
 #######################################################################
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 REGEX="^.\{74\}0.\{5\}$"
 {
 cd "$TWD" &&
 csplit ENDFB.OUT /"${REGEX}"/ {*} --suppress-matched -z --quiet
 for file in $(find . -maxdepth 1 -type f -name "xx*")
 do
-   CHUNK="$(head -1 "$file" | cut -c67-75 | tr ' ' 0)"
-   [[ -z $CHUNK || ${#CHUNK} -ne 9 ]] && CHUNK="$(sed -n '2,2 p' "$file" | cut -c67-75 | tr ' ' 0)"
-   mv "$file" "$CHUNK"
+CHUNK="$(head -1 "$file" | cut -c67-75 | tr ' ' 0)"
+[[ -z $CHUNK || ${#CHUNK} -ne 9 ]] && CHUNK="$(sed -n '2,2 p' "$file" | cut -c67-75 | tr ' ' 0)"
+mv "$file" "$CHUNK"
+[[ -z $ZIP ]] || gzip "$CHUNK"
 done
 rm -r ENDFB.IN ENDFB.OUT ENDF2C.LST
 }
