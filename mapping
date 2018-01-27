@@ -18,9 +18,11 @@
 # REVISION: ---
 #===============================================================================
 
+CODE=$(basename "$0")                                           # Executable name
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"   # Directory of this script
 USAGE="Usage:
 
-$CODE  FILE  [options]
+$CODE  CHUNKLIST  DIRLIST  [options]
 
 
 POSITIONAL ARGUMENTS
