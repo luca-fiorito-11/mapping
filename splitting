@@ -132,10 +132,21 @@ cd "$TWD" &&
 csplit ENDFB.OUT /"${REGEX}"/ {*} --suppress-matched -z --prefix="${NAME}." --quiet
 for file in $(find . -maxdepth 1 -type f -name "${NAME}.*")
 do
-CHUNK="$(head -1 "$file" | cut -c67-75 | tr ' ' 0)"
-[[ -z $CHUNK || ${#CHUNK} -ne 9 ]] && CHUNK="$(sed -n '2,2 p' "$file" | cut -c67-75 | tr ' ' 0)"
-mv "$file" "$CHUNK"
-[[ -z $ZIP ]] || gzip "$CHUNK"
+   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   # The first line should always contain MAT/MF/MT because 
+   # endf2c is run before
+   # In theory sed should never be called.
+   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   CHUNK="$(head -1 "$file" | cut -c67-75 | tr ' ' 0)"
+   [[ -z $CHUNK || ${#CHUNK} -ne 9 ]] && CHUNK="$(sed -n '2,2 p' "$file" | cut -c67-75 | tr ' ' 0)"
+   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   # Keep only the first 66 characters of each line.
+   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   awk '{print substr($0,1,66)}' "$file" > "$CHUNK"
+   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   # Zip if requested.
+   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   [[ -z $ZIP ]] || gzip "$CHUNK"
 done
-rm -r ENDFB.IN ENDFB.OUT ENDF2C.LST
+rm -rf ENDFB.IN ENDFB.OUT ENDF2C.LST "${NAME}."*
 }
