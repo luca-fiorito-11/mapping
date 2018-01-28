@@ -90,6 +90,7 @@ done
 msg="ERROR: missing positional argument \"FILE\".\n$USAGE"
 [[ ${#POSITIONAL[@]} -lt 1 ]] && { >&2 echo -e "$msg"; exit 1; }
 FILE="$( realpath ${POSITIONAL[0]})"
+NAME="$( basename $FILE)"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Set target working directory
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -128,8 +129,8 @@ EXIT_STATUS=$?
 REGEX="^.\{74\}0.\{5\}$"
 {
 cd "$TWD" &&
-csplit ENDFB.OUT /"${REGEX}"/ {*} --suppress-matched -z --quiet
-for file in $(find . -maxdepth 1 -type f -name "xx*")
+csplit ENDFB.OUT /"${REGEX}"/ {*} --suppress-matched -z --prefix="${NAME}." --quiet
+for file in $(find . -maxdepth 1 -type f -name "${NAME}.*")
 do
 CHUNK="$(head -1 "$file" | cut -c67-75 | tr ' ' 0)"
 [[ -z $CHUNK || ${#CHUNK} -ne 9 ]] && CHUNK="$(sed -n '2,2 p' "$file" | cut -c67-75 | tr ' ' 0)"
