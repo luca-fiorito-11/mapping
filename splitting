@@ -162,7 +162,7 @@ do
    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    # Zip if requested.
    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   [[ -z $ZIP ]] || gzip "$CHUNK"
+   [[ -z $ZIP ]] || gzip "$TWD/$CHUNK"
 done
 #rm -rf ENDFB.IN ENDFB.OUT ENDF2C.LST "${NAME}."*
 }
