@@ -102,6 +102,12 @@ TWD="${TWD:-$(pwd)}"
 [[ -d "$TWD" ]] ||  { >&2 echo -e "ERROR: no existing directory called '$TWD'"; exit 1; }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Set target working directory
+# Standardization and csplit is done in temporary folder
+# to prevent from overwriting files with same name when
+# script is executed in parallel.
+# 
+# Random number is added to the temporary directory (in 
+# case two files with the same name are processed).
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 TMP="${TWD}/.${NAME}_${RANDOM}.tmp"
 mkdir -p "$TMP"
