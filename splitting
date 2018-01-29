@@ -68,6 +68,10 @@ shift # past value
 ZIP="--zip"
 shift # past argument
 ;;
+--tmp-directory)
+TMP="--tmp-directory"
+shift # past argument
+;;
 *)    # unknown option
 POSITIONAL+=("$1") # save it in an array for later
 shift # past argument
@@ -96,6 +100,12 @@ NAME="$( basename $FILE)"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 TWD="${TWD:-$(pwd)}"
 [[ -d "$TWD" ]] ||  { >&2 echo -e "ERROR: no existing directory called '$TWD'"; exit 1; }
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Set target working directory
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TMP="${TWD}/.${NAME}_${RANDOM}.tmp"
+mkdir -p "$TMP"
+
 
 
 #######################################################################
@@ -109,7 +119,7 @@ TWD="${TWD:-$(pwd)}"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 ENDF2C="${SCRIPTDIR}/data/codes/endf2c"
 {
-cd $TWD &&
+cd $TMP &&
 ln -sf "$FILE" ENDFB.IN
 "$ENDF2C" >/dev/null 2>&1
 EXIT_STATUS=$?
@@ -128,7 +138,7 @@ EXIT_STATUS=$?
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 REGEX="^.\{74\}0.\{5\}$"
 {
-cd "$TWD" &&
+cd "$TMP" &&
 csplit ENDFB.OUT /"${REGEX}"/ {*} --suppress-matched -z --prefix="${NAME}." --quiet
 for file in $(find . -maxdepth 1 -type f -name "${NAME}.*")
 do
@@ -142,11 +152,12 @@ do
    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    # Keep only the first 66 characters of each line.
    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   awk '{print substr($0,1,66)}' "$file" > "$CHUNK"
+   awk '{print substr($0,1,66)}' "$file" > "$TWD/$CHUNK"
    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    # Zip if requested.
    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    [[ -z $ZIP ]] || gzip "$CHUNK"
 done
-rm -rf ENDFB.IN ENDFB.OUT ENDF2C.LST "${NAME}."*
+#rm -rf ENDFB.IN ENDFB.OUT ENDF2C.LST "${NAME}."*
 }
+rm -rf "$TMP"
