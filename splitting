@@ -99,6 +99,7 @@ NAME="$( basename $FILE)"
 # Set target working directory
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 TWD="${TWD:-$(pwd)}"
+TWD="$(realpath $TWD)"
 [[ -d "$TWD" ]] ||  { >&2 echo -e "ERROR: no existing directory called '$TWD'"; exit 1; }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Set target working directory
@@ -157,13 +158,14 @@ do
    [[ -z $CHUNK || ${#CHUNK} -ne 9 ]] && CHUNK="$(sed -n '2,2 p' "$file" | cut -c67-75 | tr ' ' 0)"
    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    # Keep only the first 66 characters of each line.
-   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   awk '{print substr($0,1,66)}' "$file" > "$TWD/$CHUNK"
-   #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    # Zip if requested.
    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   [[ -z $ZIP ]] || gzip "$TWD/$CHUNK"
+   if [[ -z $ZIP ]]
+   then
+      awk '{print substr($0,1,66)}' "$file" > "$TWD/$CHUNK"
+   else
+      awk '{print substr($0,1,66)}' "$file" | gzip > "$TWD/${CHUNK}.gz"
+   fi
 done
-#rm -rf ENDFB.IN ENDFB.OUT ENDF2C.LST "${NAME}."*
 }
 rm -rf "$TMP"
