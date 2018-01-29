@@ -107,10 +107,11 @@ do
 done
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Get directories (DIRS) and associated keywords (KEYS).
+# Skip lines starting with # symbol.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [[ -s "$DIRLIST" ]] || { >&2 echo -e "ERROR: no file called '$DIRLIST'"; exit 1; }
-DIRS=($( awk '{print $1}' $DIRLIST ))
-KEYS=($( awk '{print $2}' $DIRLIST ))
+DIRS=($( awk '/^[^\#]/ {print $1}' $DIRLIST ))
+KEYS=($( awk '/^[^\#]/ {print $2}' $DIRLIST ))
 NDIRS=${#DIRS[@]}
 for DIR in ${DIRS[@]}
 do
