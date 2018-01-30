@@ -42,8 +42,6 @@ KEYWORD ARGUMENTS
 -z|--zip                    Perform comparison on zipped files using zcmp.
 
 --xml-output                Produce xml output.
-
---csv-output                Produce csv output.
 "
 
 
@@ -70,11 +68,6 @@ case $key in
     ;;
     --xml-output)
     XML="$2"
-    shift # past argument
-    shift # past value
-    ;;
-    --csv-output)
-    CSV="$2"
     shift # past argument
     shift # past value
     ;;
@@ -146,6 +139,7 @@ done
 #######################################################################
 [[ -z $XML ]] || printf "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" > "$XML"
 [[ -z $XML ]] || printf "<evals>\n" >> "$XML"
+printf "%10s  %10s  %10s  %10s  %10s  %10s  %10s\n" "LIBRARY" "VERSION" "MAT" "MF" "MT" "ORIGIN-LIB" "ORIGIN-VER" 
 for CHUNK in ${CHUNKLIST[@]}
 do
    NAME="$(basename $CHUNK)"
@@ -161,7 +155,6 @@ do
          $CMD --silent $OLD $CHUNK && { ORIGINLIB=${LIBS[$i]}; ORIGINVER=${VERS[$i]}; break; }
       fi
    done
-   printf "%s  ORIGIN  %s\n" "$CHUNK" "${ORIGINLIB}-${ORIGINVER}"
    [[ -z $XML ]] || printf "  <section>\n" >> "$XML"
    [[ -z $XML ]] || printf "    <mat>%s</mat>\n" $MAT >> "$XML"
    [[ -z $XML ]] || printf "    <mf>%s</mf>\n" $MF >> "$XML"
@@ -169,6 +162,7 @@ do
    [[ -z $XML ]] || printf "    <origin-lib>%s</origin-lib>\n" $ORIGINLIB >> "$XML"
    [[ -z $XML ]] || printf "    <origin-ver>%s</origin-ver>\n" $ORIGINVER >> "$XML"
    [[ -z $XML ]] || printf "  </section>\n" >> "$XML"
+   printf "%10s, %10s, %10s, %10s, %10s, %10s, %10s\n" "JEFF" "3.3" "$MAT" "$MF" "$MT" "${ORIGINLIB}" "${ORIGINVER}"
    unset ORIGINLIB ORIGINVER
 done
 [[ -z $XML ]] || printf "</evals>\n" >> "$XML"
