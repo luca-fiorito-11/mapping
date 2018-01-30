@@ -42,6 +42,8 @@ KEYWORD ARGUMENTS
 -z|--zip                    Perform comparison on zipped files using zcmp.
 
 --xml-output                Produce xml output.
+
+--csv-output                Produce csv output.
 "
 
 
@@ -68,6 +70,11 @@ case $key in
     ;;
     --xml-output)
     XML="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    --csv-output)
+    CSV="$2"
     shift # past argument
     shift # past value
     ;;
@@ -118,13 +125,15 @@ done
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [[ -s "$DIRLIST" ]] || { >&2 echo -e "ERROR: no file called '$DIRLIST'"; exit 1; }
 DIRS=($( awk '/^[^\#]/ {print $1}' $DIRLIST ))
-KEYS=($( awk '/^[^\#]/ {print $2}' $DIRLIST ))
+LIBS=($( awk '/^[^\#]/ {print $2}' $DIRLIST ))
+VERS=($( awk '/^[^\#]/ {print $3}' $DIRLIST ))
 NDIRS=${#DIRS[@]}
 for DIR in ${DIRS[@]}
 do
    [[ -d "$DIR" ]] || { >&2 echo -e "ERROR: no directory called '$DIR'"; exit 1; }
 done
-[[ $NDIRS -ne ${#KEYS[@]} ]] && { >&2 echo -e "ERROR: number of directory differs from number of keywords."; exit 1; }
+[[ $NDIRS -ne ${#LIBS[@]} ]] && { >&2 echo -e "ERROR: first and second columns of file '$DIRLIST' have different length."; exit 1; }
+[[ $NDIRS -ne ${#VERS[@]} ]] && { >&2 echo -e "ERROR: first and third columns of file '$DIRLIST' have different length."; exit 1; }
 
 
 
@@ -149,16 +158,17 @@ do
       if [[ -s $OLD ]]
       then
          [[ -z $ZIP ]] && CMD="cmp" || CMD="zcmp"
-         $CMD --silent $OLD $CHUNK && { ORIGIN=${KEYS[$i]}; break; }
+         $CMD --silent $OLD $CHUNK && { ORIGINLIB=${LIBS[$i]}; ORIGINVER=${VERS[$i]}; break; }
       fi
    done
-   printf "%s  ORIGIN  %s\n" "$CHUNK" "${ORIGIN:-NEW}"
+   printf "%s  ORIGIN  %s\n" "$CHUNK" "${ORIGINLIB}-${ORIGINVER}"
    [[ -z $XML ]] || printf "  <section>\n" >> "$XML"
    [[ -z $XML ]] || printf "    <mat>%s</mat>\n" $MAT >> "$XML"
    [[ -z $XML ]] || printf "    <mf>%s</mf>\n" $MF >> "$XML"
    [[ -z $XML ]] || printf "    <mt>%s</mt>\n" $MT >> "$XML"
-   [[ -z $XML ]] || printf "    <origin>%s</origin>\n" $ORIGIN >> "$XML"
+   [[ -z $XML ]] || printf "    <origin-lib>%s</origin-lib>\n" $ORIGINLIB >> "$XML"
+   [[ -z $XML ]] || printf "    <origin-ver>%s</origin-ver>\n" $ORIGINVER >> "$XML"
    [[ -z $XML ]] || printf "  </section>\n" >> "$XML"
-   unset ORIGIN
+   unset ORIGINLIB ORIGINVER
 done
 [[ -z $XML ]] || printf "</evals>\n" >> "$XML"
