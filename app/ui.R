@@ -10,7 +10,7 @@ library(shiny)
 shinyUI(fluidPage(
 
   # Application title
-  titlePanel("ND Puzzler"),
+  titlePanel("ND Mapping"),
 
   # Sidebar with a slider input for number of bins
   sidebarLayout(

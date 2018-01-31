@@ -3,8 +3,7 @@
 #
 # MAPPING app 
 # Authors : F. Michel-Sendis & L. Fiorito 
-#
-library(shiny)
+# 
 
 shinyServer(function(input, output) {
 
