@@ -16,9 +16,13 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       
-      selectInput('MAT',tag('h4', 'Material'),
-                  choices = unique(df$MAT), 
-                  multiple=FALSE, selected="9234"),
+      selectInput('X',tag('h4', 'Element'),
+                  choices = unique(df$X), 
+                  multiple=FALSE),
+      
+      selectInput('A',tag('h4', 'Mass Number'),
+                  choices = unique(df$A), 
+                  multiple=FALSE),
       
       selectInput('LIB',tag('h4', 'Library'),
                   choices = unique(df$LIB), 

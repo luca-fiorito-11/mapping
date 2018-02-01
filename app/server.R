@@ -34,7 +34,7 @@ shinyServer(function(input, output) {
     )
     
     
-    df<-filter(df, MAT==input$MAT)
+    df<-filter(df, X==input$X && A==input$A)
     #df<-filter(df, MF==input$MF)
     
     p<-plot_ly(df, x=~VER, y=~MT, color=~VERORIG, 
