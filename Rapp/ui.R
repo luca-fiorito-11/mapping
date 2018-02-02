@@ -16,6 +16,10 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       
+      selectInput('LIBVER',tag('h4', 'Library'),
+                  choices = unique(df$LIBVER), 
+                  multiple=FALSE, selected ="JEFF-3.3"),
+      
       selectInput('X',tag('h4', 'Element'),
                   choices = unique(df$X), 
                   multiple=FALSE),
@@ -23,23 +27,20 @@ shinyUI(fluidPage(
       selectInput('A',tag('h4', 'Mass Number'),
                   choices = unique(df$A), 
                   multiple=FALSE),
+      selectInput('M',tag('h4', 'Isomer'),
+                  choices = unique(df$M), 
+                  multiple=FALSE, selected="g")
       
-      selectInput('LIB',tag('h4', 'Library'),
-                  choices = unique(df$LIB), 
-                  multiple=FALSE, selected="JEFF"),
       
-      selectInput('VER',tag('h4', 'Version'),
-                  choices = unique(df$VER), 
-                  multiple=FALSE, selected="3.3"),
-      
-      selectInput('MF',tag('h4', 'MF'),
-                  choices = unique(df$MF), 
-                  multiple=FALSE,
-                  selected="3"
-                  )
-      #selectInput('MT',tag('h4', 'MT'),
-       #           choices = unique(df$MT), 
-        #          multiple=FALSE)
+       
+      # selectInput('MF',tag('h4', 'MF'),
+      #             choices = unique(df$MF), 
+      #             multiple=FALSE,
+      #             selected="3"
+      #             )
+      # #selectInput('MT',tag('h4', 'MT'),
+      #  #           choices = unique(df$MT), 
+      #   #          multiple=FALSE)
     
        
     ),

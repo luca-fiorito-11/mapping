@@ -9,42 +9,31 @@ shinyServer(function(input, output) {
 
   output$plot_map<-renderPlotly({ 
     
-    y_layout<-list(
-      title='MT', 
-      showticklabels = TRUE,
-      ticks = "outside",
-      titlefont= list( family='Helvetica',
-                       size='14',
-                       color='gray')
-    )
+    pdf<-filter(df, X==input$X, A==input$A, M==input$M, LIBVER==input$LIBVER)
+    #pdf<-filter(pdf, MF==input$MF)
+    #title<-paste("Distribution for ",input$LIBVER," evaluation of ",input$X,"-",input$A)
     
-    x_layout<-list(
-      title='Source', 
-      showticklabels = TRUE,
-      titlefont= list( family='Helvetica',
-                       size='14',
-                       color='gray')
-    )
-    m <- list(
-      l = 100,
-      r = 0,
-      b = 20,
-      t = 50,
-      pad = 0
-    )
+    scale_color_manual(breaks = c("8", "6", "4"),
+                       values=c("red", "blue", "green"))
     
     
-    df<-filter(df, X==input$X && A==input$A)
-    #df<-filter(df, MF==input$MF)
+    g<-ggplot(pdf, aes(x=MF, y=MT)) + 
+      geom_point(aes(size=5.5, fill = LIBVERORIG, shape=LIBORIG)) + 
+      coord_flip() + 
+      scale_fill_manual(values=my_colors, drop=FALSE)+
+      theme_light() + 
+      theme(legend.title=element_blank(), 
+            plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
+            plot.margin = unit(c(0, 1, 0.5, 0.5), "cm"))
     
-    p<-plot_ly(df, x=~VER, y=~MT, color=~VERORIG, 
-               type='scatter', mode='markers')%>%
-      layout(margin=m, xaxis=x_layout, yaxis=y_layout, showlegend=TRUE)
+    p<-ggplotly(g)  
+      
+    p%>%config(displayModeBar = 'hover',showLink=FALSE,senddata=FALSE,editable=FALSE, 
+                 displaylogo=FALSE, collaborate=FALSE, cloud=FALSE, 
+                 modeBarButtonsToRemove=c('select2d', 'lasso2d','hoverClosestCartesian',
+                                          'hoverCompareCartesian'))
+     
     
-    p<-p%>%config(displayModeBar = 'hover',showLink=FALSE,senddata=FALSE,editable=FALSE, 
-                  displaylogo=FALSE, collaborate=FALSE, cloud=FALSE, 
-                  modeBarButtonsToRemove=c('select2d', 'lasso2d','hoverClosestCartesian',
-                                           'hoverCompareCartesian'))
-    p
+     
   })
  })
