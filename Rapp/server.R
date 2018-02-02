@@ -18,9 +18,9 @@ shinyServer(function(input, output) {
     
     
     g<-ggplot(pdf, aes(x=MF, y=MT)) + 
-      geom_point(aes(size=5.5, fill = LIBVERORIG, shape=LIBORIG)) + 
+      geom_point(shape=15, aes(size=5, fill = LIBVERORIG)) + 
       coord_flip() + 
-      scale_fill_manual(values=my_colors, drop=FALSE)+
+      scale_fill_manual(name="Origin", values=my_colors, drop=FALSE)+
       theme_light() + 
       theme(legend.title=element_blank(), 
             plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
