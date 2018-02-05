@@ -18,12 +18,13 @@ library(reshape2)
 library(data.table)
 library(DT)
 library(dtplyr)
+library(dplyr)
 library(splitstackshape)
 #library(foreach)
  
  
 df    <-fread('csv/testdata.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)  
-# mats contains 562 (JEFF.33 correspondeces between MAT and Z,A,M)
+# mats contains 562 (JEFF.33 correspondences between MAT and Z,A,M)
 mats  <-fread('csv/matzsymam.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)  
 df<-merge(df, mats)
 df$MFMT<-paste(df$MF*1000+df$MT)
@@ -37,7 +38,7 @@ df$LIBVERORIG<-factor(df$LIBVERORIG)
 df$LIBVER<-factor(df$LIBVER)
 
 #remove this line when data is good : 
-df<-filter(df, LIBVER=="JEFF-3.3")
+#df<-filter(df, LIBVER=="JEFF-3.3")
 
 dcount<-count(df, LIBVER, Z,X,A,M)
 dcount$TOT_CHUNKS<-dcount$n
