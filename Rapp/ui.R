@@ -4,8 +4,7 @@
 # MAPPING app  
 # Authors : F. Michel-Sendis & L. Fiorito 
 #
-
-library(shiny)
+ 
 
 dtitle<-tagList(tags$img(src='dna-strand.png', height='40'))
 

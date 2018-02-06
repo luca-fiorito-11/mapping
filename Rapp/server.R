@@ -67,3 +67,32 @@ shinyServer(function(input, output) {
              yaxis=yaxis , xaxis=xaxis)
   })
  })
+
+
+
+
+
+
+
+# dcount<-count(df, LIBVER, Z,X,A,M)
+# dcount$TOT_CHUNKS<-dcount$n
+# dcount$n<-NULL
+# df<-merge(df, dcount)
+# 
+# dcount<-count(df, Z, X, A, M, LIBVER, LIBVERORIG, TOT_CHUNKS)
+# dcount$N_CHUNKS<-dcount$n
+# dcount$n<-NULL
+# dcount$ORIG_PCT<-round(dcount$N_CHUNKS/dcount$TOT_CHUNKS*100,1) # keep 1 decimal place
+# 
+# 
+# dcount2<-count(df, Z, X, A, M,LIBVER, MF)
+# dcount2$TOT_MT_IN_MF<-dcount2$n
+# dcount2$n<-NULL
+# 
+# dcount3<-count(df, Z, X, A, M,LIBVER, LIBVERORIG, MF)
+# dcount3$N_MTLIBVER_IN_MF<-dcount3$n
+# dcount3$n<-NULL
+# 
+# dcount2<-merge(dcount2, dcount3)
+# dcount3<-NULL
+# dcount2$PCT_MT_IN_MF<-round(dcount2$N_MTLIBVER_IN_MF/dcount2$TOT_MT_IN_MF,1)*100

@@ -34,33 +34,7 @@ df$LIBVER<-paste(df$LIB, df$VER, sep='-')
 
 df$MF<-factor(df$MF)
 df$MT<-factor(df$MT)
-# df$LIBVERORIG<-factor(df$LIBVERORIG)
-# df$LIBVER<-factor(df$LIBVER)
  
-
-dcount<-count(df, LIBVER, Z,X,A,M)
-dcount$TOT_CHUNKS<-dcount$n
-dcount$n<-NULL
-df<-merge(df, dcount)
-
-dcount<-count(df, Z, X, A, M, LIBVER, LIBVERORIG, TOT_CHUNKS)
-dcount$N_CHUNKS<-dcount$n
-dcount$n<-NULL
-dcount$ORIG_PCT<-round(dcount$N_CHUNKS/dcount$TOT_CHUNKS*100,1) # keep 1 decimal place
-
-
-dcount2<-count(df, Z, X, A, M,LIBVER, MF)
-dcount2$TOT_MT_IN_MF<-dcount2$n
-dcount2$n<-NULL
-
-dcount3<-count(df, Z, X, A, M,LIBVER, LIBVERORIG, MF)
-dcount3$N_MTLIBVER_IN_MF<-dcount3$n
-dcount3$n<-NULL
-
-dcount2<-merge(dcount2, dcount3)
-dcount3<-NULL
-dcount2$PCT_MT_IN_MF<-round(dcount2$N_MTLIBVER_IN_MF/dcount2$TOT_MT_IN_MF,1)*100
-
 my_colors<-c(
 "JEFF-3.3"="#097C28",
 "JEFF-3.2"="#72FD7A",
