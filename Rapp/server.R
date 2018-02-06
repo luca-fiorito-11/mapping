@@ -70,6 +70,12 @@ shinyServer(function(input, output) {
   # Plot DNA evolution using ggplot 
   output$tempPlot <- renderPlotly({
     count_df = df[LIB==input$LIB & MAT==input$MAT , .(count=.N) , by="LIBVER,LIBVERORIG"]
+    # count_df <- subset(merge(count_df, libdates), select=c(DATE, LIBVER, LIBVERORIG, count))
+    count_df <- subset(merge(count_df, libdates), select=c(DATE, LIBVERORIG, count))
+    count_df <- count_df %>%
+      tidyr::spread(key = LIBVERORIG, value = count, fill = 0) %>%
+      tidyr::gather(key = LIBVERORIG, value = count, - DATE) %>%
+      arrange(DATE, LIBVERORIG)
     title<-paste("AAA")
     
     axisfont <- list(
@@ -91,13 +97,17 @@ shinyServer(function(input, output) {
       # tickangle=80
     )
     
+    # Draw stacked bar chart.
     # If you want the heights of the bars to represent values in the data, use stat="identity" and map a variable to the y aesthetic.
-    g <- ggplot(count_df, aes(x=LIBVER, y=count)) +
-      geom_bar(aes(fill=LIBVERORIG),
-               stat = "identity") +
+    # g <- ggplot(count_df, aes(x=LIBVER, y=count)) +
+    #   geom_bar(aes(fill=LIBVERORIG), stat = "identity") +
+
+    # Draw stacked area chart.
+    g <- ggplot(count_df, aes(x=DATE, y=count, fill=LIBVERORIG)) + 
+      geom_area(alpha=0.6 , size=0.2, colour="black") +
       scale_fill_manual(values=my_colors) +
-      theme_light() + 
-      theme(legend.title=element_blank(),  
+      theme_light() +
+      theme(legend.title=element_blank(),
             plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
             plot.margin = unit(c(0.7, 0, 2, 1), "cm")) #top, right, bottom, left
     p <- ggplotly(g)
