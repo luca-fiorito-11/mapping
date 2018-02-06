@@ -66,6 +66,52 @@ shinyServer(function(input, output) {
       layout(title=title, autosize = F, width = 1200, height = 500, 
              yaxis=yaxis , xaxis=xaxis)
   })
+
+  # Plot DNA evolution using ggplot 
+  output$tempPlot <- renderPlotly({
+    count_df = df[LIB==input$LIB & MAT==input$MAT , .(count=.N) , by="LIBVER,LIBVERORIG"]
+    title<-paste("AAA")
+    
+    axisfont <- list(
+      family = "Helvetica",
+      size = 14,
+      color = "blue"
+    )
+    
+    yaxis=list(
+      titlefont= axisfont
+    )
+    xaxis=list(
+      titlefont= axisfont,
+      title = "Library Release",
+      zeroline = FALSE,
+      showline = FALSE,
+      showticklabels = TRUE,
+      showgrid = TRUE
+      # tickangle=80
+    )
+    
+    # If you want the heights of the bars to represent values in the data, use stat="identity" and map a variable to the y aesthetic.
+    g <- ggplot(count_df, aes(x=LIBVER, y=count))+geom_bar(aes(fill=LIBVERORIG), stat = "identity")
+    p <- ggplotly(g)
+    p%>%config(displayModeBar = 'pan',
+               showLink=FALSE,
+               senddata=FALSE,
+               editable=FALSE,
+               displaylogo=FALSE,
+               collaborate=FALSE,
+               cloud=FALSE,
+               modeBarButtonsToRemove=c('select2d',
+                                        'lasso2d',
+                                        'hoverClosestCartesian',
+                                        'hoverCompareCartesian'))%>%
+      layout(title=title,
+             autosize = F,
+             # width = 1200,
+             # height = 500,
+             yaxis=yaxis,
+             xaxis=xaxis)
+  })  
  })
 
 

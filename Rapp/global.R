@@ -12,7 +12,7 @@ library(shinydashboard)
 library(shinythemes)
 library(shinyjs)  
 library(VIM)
-library(wesanderson)
+# library(wesanderson)
 library(rsconnect)
 library(reshape2)
 library(data.table)
@@ -22,20 +22,23 @@ library(dplyr)
 library(splitstackshape)
 #library(foreach)
  
- 
-df    <-fread('csv/testdata.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)  
-# mats contains 562 (JEFF.33 correspondences between MAT and Z,A,M)
-mats  <-fread('csv/matzsymam.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)  
-df<-merge(df, mats)
-df$MFMT<-paste(df$MF*1000+df$MT)
-df<- df[order(df$MFMT),]
-df$LIBVERORIG<-paste(df$LIBORIG, df$VERORIG, sep='-')
-df$LIBVER<-paste(df$LIB, df$VER, sep='-')
+# set environment variable to pass proxy
+Sys.setenv(HTTPS_PROXY="http://proxy-vip1.oecd-nea.org:3128")
 
-df$MF<-factor(df$MF)
-df$MT<-factor(df$MT)
+df <- fread('csv/testdata.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)  
+# mats contains 562 (JEFF.33 correspondences between MAT and Z,A,M)
+mats <- fread('csv/matzsymam.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)  
+df <- merge(df, mats)
+df$MFMT <- paste(df$MF*1000+df$MT)
+df <- df[order(df$MFMT),]
+# add fields release (LIBVER) and origin release (LIBVERORIG)
+df$LIBVERORIG <- paste(df$LIBORIG, df$VERORIG, sep='-')
+df$LIBVER <- paste(df$LIB, df$VER, sep='-')
+
+df$MF <- factor(df$MF)
+df$MT <- factor(df$MT)
  
-my_colors<-c(
+my_colors <- c(
 "JEFF-3.3"="#097C28",
 "JEFF-3.2"="#72FD7A",
 "JEFF-3.1.2"="#2CA743",

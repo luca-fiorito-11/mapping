@@ -35,6 +35,28 @@ body <- dashboardBody(
       ) 
     ),#end box
      
+   # Box for the DNA evolution of an evaluated file
+   box(title = tag('b', "Evolution"), status="warning", collapsible = TRUE,# collapsed=TRUE,
+       width = 12,
+       fluidRow(
+         column(3,selectInput('LIB',
+                              tag('h4', 'Library'),
+                              choices = unique(df$LIB),
+                              multiple=FALSE,
+                              selected ="JEFF")),
+         column(3,selectInput('MAT',
+                              tag('h4', 'MAT'),
+                              choices = unique(df$MAT),
+                              multiple=FALSE))
+       ),
+       fluidRow(
+         column(12,
+                plotlyOutput("tempPlot", height = '500px')
+         )
+       )
+   ),#end box,
+
+   
    box(title = tag('b', "Compare"), status="warning", collapsible = TRUE,# collapsed=TRUE,
        width = 12,
        fluidRow(
@@ -42,9 +64,9 @@ body <- dashboardBody(
                 plotlyOutput("plot_compare", height = '1000px')
          )
        )
-   )
-
-    )# end fluidPage
+   )#end box
+   
+   )# end fluidPage
   )# end dashboardbody
 
   dashboardPage(
