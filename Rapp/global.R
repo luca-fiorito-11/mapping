@@ -63,6 +63,7 @@ my_colors <- c(
 )
 
 
+libdates <- fread('csv/libdate.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)
 
 
 
