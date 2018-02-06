@@ -97,18 +97,15 @@ DIRLIST="${POSITIONAL[1]}"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Get ENDF-6 chunks from file CHUNKLIST.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if [[ -d "$CHUNKLIST" ]]
-then
-   CHUNKLIST=($(find $(realpath "$CHUNKLIST") -maxdepth 1 -type f -o -type l))
-elif [[ -s "$CHUNKLIST" ]]
-then
-   CHUNKLIST=($(cat "$CHUNKLIST"))
-else
-   >&2 echo -e "ERROR: no file or directory called '$CHUNKLIST'"; exit 1
-fi
-[[ ${#CHUNKLIST[@]} -eq 0 ]] && {>&2 echo -e "ERROR: no ENDF-6 chunk file was given.";exit 1;}
-printf '%d chunk files given\n' "${#CHUNKLIST[@]}"
-for CHUNK in ${CHUNKLIST[@]}
+[[ -s "$CHUNKLIST" ]] || { >&2 echo -e "ERROR: no file called '$CHUNKLIST'"; exit 1; }
+CHUNKS=($( awk '/^[^\#]/ {print $1}' $CHUNKLIST ))
+CLIBS=($( awk '/^[^\#]/ {print $2}' $CHUNKLIST ))
+CVERS=($( awk '/^[^\#]/ {print $3}' $CHUNKLIST ))
+NCHUNKS=${#CHUNKS[@]}
+[[ $NCHUNKS -eq 0 ]] && {>&2 echo -e "ERROR: no ENDF-6 chunk file was given.";exit 1;}
+[[ $NCHUNKS -ne ${#CLIBS[@]} ]] && { >&2 echo -e "ERROR: first and second columns of file '$CHUNKLIST' have different length."; exit 1; }
+[[ $NCHUNKS -ne ${#CVERS[@]} ]] && { >&2 echo -e "ERROR: first and second columns of file '$CHUNKLIST' have different length."; exit 1; }
+for CHUNK in ${CHUNKS[@]}
 do
    [[ -s "$CHUNK" ]] || { >&2 echo -e "ERROR: empty or non-existing ENDF-6 chunk file '$CHUNK'"; exit 1; }
 done
@@ -121,12 +118,13 @@ DIRS=($( awk '/^[^\#]/ {print $1}' $DIRLIST ))
 LIBS=($( awk '/^[^\#]/ {print $2}' $DIRLIST ))
 VERS=($( awk '/^[^\#]/ {print $3}' $DIRLIST ))
 NDIRS=${#DIRS[@]}
+[[ $NDIRS -eq 0 ]] && {>&2 echo -e "ERROR: no directory was given.";exit 1;}
+[[ $NDIRS -ne ${#LIBS[@]} ]] && { >&2 echo -e "ERROR: first and second columns of file '$DIRLIST' have different length."; exit 1; }
+[[ $NDIRS -ne ${#VERS[@]} ]] && { >&2 echo -e "ERROR: first and third columns of file '$DIRLIST' have different length."; exit 1; }
 for DIR in ${DIRS[@]}
 do
    [[ -d "$DIR" ]] || { >&2 echo -e "ERROR: no directory called '$DIR'"; exit 1; }
 done
-[[ $NDIRS -ne ${#LIBS[@]} ]] && { >&2 echo -e "ERROR: first and second columns of file '$DIRLIST' have different length."; exit 1; }
-[[ $NDIRS -ne ${#VERS[@]} ]] && { >&2 echo -e "ERROR: first and third columns of file '$DIRLIST' have different length."; exit 1; }
 
 
 
@@ -139,9 +137,12 @@ done
 #######################################################################
 [[ -z $XML ]] || printf "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" > "$XML"
 [[ -z $XML ]] || printf "<evals>\n" >> "$XML"
-printf "%10s  %10s  %10s  %10s  %10s  %10s  %10s\n" "LIBRARY" "VERSION" "MAT" "MF" "MT" "ORIGIN-LIB" "ORIGIN-VER" 
-for CHUNK in ${CHUNKLIST[@]}
+[[ -z $NOHEADER ]] && printf "%s,%s,%s,%s,%s,%s,%s\n" "LIB" "VER" "MAT" "MF" "MT" "OLIB" "OVER" 
+for j in $(seq 0 $(($NCHUNKS-1)))
 do
+   CHUNK=${CHUNKS[$j]}
+   CLIB=${CLIBS[$j]}
+   CVER=${CVERS[$j]}
    NAME="$(basename $CHUNK)"
    MAT="$(echo $NAME | cut -c1-4 | sed 's/^0*//')"
    MF="$(echo $NAME | cut -c5-6 | sed 's/^0*//')"
@@ -162,7 +163,7 @@ do
    [[ -z $XML ]] || printf "    <origin-lib>%s</origin-lib>\n" $ORIGINLIB >> "$XML"
    [[ -z $XML ]] || printf "    <origin-ver>%s</origin-ver>\n" $ORIGINVER >> "$XML"
    [[ -z $XML ]] || printf "  </section>\n" >> "$XML"
-   printf "%10s, %10s, %10s, %10s, %10s, %10s, %10s\n" "JEFF" "3.3" "$MAT" "$MF" "$MT" "${ORIGINLIB}" "${ORIGINVER}"
+   printf "%s,%s,%s,%s,%s,%s,%s\n" "$CLIB" "$CVER" "$MAT" "$MF" "$MT" "${ORIGINLIB}" "${ORIGINVER}"
    unset ORIGINLIB ORIGINVER
 done
 [[ -z $XML ]] || printf "</evals>\n" >> "$XML"
