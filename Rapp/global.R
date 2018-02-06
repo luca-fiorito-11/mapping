@@ -62,9 +62,9 @@ my_colors <- c(
 "TENDL-2009"="#000000"
 )
 
-
+# dataframe that asspciates releases to dates
 libdates <- fread('csv/libdate.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)
-
+libdates$LIBVER <- paste(libdates$LIB, libdates$VER, sep='-')
 
 
 
