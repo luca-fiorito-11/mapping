@@ -60,14 +60,34 @@ body <- dashboardBody(
    box(title = tag('b', "Compare"), status="warning", collapsible = TRUE,# collapsed=TRUE,
        width = 12,
        fluidRow(
+         column(3,selectInput('LIBVER1',tag('h4', 'Library 1'),choices = unique(df$LIBVER),multiple=FALSE, 
+                              selected ="JEFF-3.3")),
+         column(3,selectInput('LIBVER2',tag('h4', 'Library 2'),choices = unique(df$LIBVER),multiple=FALSE, 
+                              selected ="JEFF-3.2"))
+         
+       ),
+       fluidRow(
          column(12,
-                plotlyOutput("plot_compare", height = '1000px')
+                plotlyOutput("plot_diffs", height = '600px')
          )
        )
    )#end box
    
    )# end fluidPage
   )# end dashboardbody
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   dashboardPage(
     skin="black",
