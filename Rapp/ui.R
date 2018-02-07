@@ -35,6 +35,28 @@ body <- dashboardBody(
       ) 
     ),#end box
      
+    
+    box(title = tag('b', "Compare"), status="warning", collapsible = TRUE,# collapsed=TRUE,
+        width = 12,
+        fluidRow(
+          column(5, 
+                 radioButtons('CHOICE', label = h4("Display :"),
+                              choices = list("Different MF/MT" = 1, "Identical MF/MT" = 2), 
+                              selected = 1,inline = TRUE)),
+          
+          column(3,selectInput('LIBVER1',tag('h4', 'Library 1'),choices = unique(df$LIBVER),multiple=FALSE, 
+                               selected ="JEFF-3.3")),
+          column(3,selectInput('LIBVER2',tag('h4', 'Library 2'),choices = unique(df$LIBVER),multiple=FALSE, 
+                               selected ="JEFF-3.2"))
+          
+        ),
+        fluidRow(
+          column(12,
+                 plotlyOutput("plot_diffs", height = '600px')
+          )
+        )
+    ),#end box
+    
    # Box for the DNA evolution of an evaluated file
    box(title = tag('b', "Evolution"), status="warning", collapsible = TRUE,# collapsed=TRUE,
        width = 12,
@@ -54,37 +76,9 @@ body <- dashboardBody(
                 plotlyOutput("tempPlot", height = '500px')
          )
        )
-   ),#end box,
-
-   
-   box(title = tag('b', "Compare"), status="warning", collapsible = TRUE,# collapsed=TRUE,
-       width = 12,
-       fluidRow(
-         column(3,selectInput('LIBVER1',tag('h4', 'Library 1'),choices = unique(df$LIBVER),multiple=FALSE, 
-                              selected ="JEFF-3.3")),
-         column(3,selectInput('LIBVER2',tag('h4', 'Library 2'),choices = unique(df$LIBVER),multiple=FALSE, 
-                              selected ="JEFF-3.2"))
-         
-       ),
-       fluidRow(
-         column(12,
-                plotlyOutput("plot_diffs", height = '600px')
-         )
-       )
    )#end box
-   
    )# end fluidPage
   )# end dashboardbody
-
-
-
-
-
-
-
-
-
-
 
 
 
