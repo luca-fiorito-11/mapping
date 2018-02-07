@@ -116,7 +116,14 @@ shinyServer(function(input, output) {
     )
     
     # If you want the heights of the bars to represent values in the data, use stat="identity" and map a variable to the y aesthetic.
-    g <- ggplot(count_df, aes(x=LIBVER, y=count))+geom_bar(aes(fill=LIBVERORIG), stat = "identity")
+    g <- ggplot(count_df, aes(x=LIBVER, y=count)) +
+      geom_bar(aes(fill=LIBVERORIG),
+               stat = "identity") +
+      scale_fill_manual(values=my_colors) +
+      theme_light() + 
+      theme(legend.title=element_blank(),  
+            plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
+            plot.margin = unit(c(0.7, 0, 2, 1), "cm")) #top, right, bottom, left
     p <- ggplotly(g)
     p%>%config(displayModeBar = 'pan',
                showLink=FALSE,
@@ -131,8 +138,8 @@ shinyServer(function(input, output) {
                                         'hoverCompareCartesian'))%>%
       layout(title=title,
              autosize = F,
-             # width = 1200,
-             # height = 500,
+             width = 1200,
+             height = 500,
              yaxis=yaxis,
              xaxis=xaxis)
   })  
@@ -174,8 +181,9 @@ output$plot_diffs <- renderPlotly({
   p
 })
 
+ 
 })
-
+ 
 # dcount<-count(df, LIBVER, Z,X,A,M)
 # dcount$TOT_CHUNKS<-dcount$n
 # dcount$n<-NULL
