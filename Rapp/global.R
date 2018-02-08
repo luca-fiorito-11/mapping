@@ -65,8 +65,8 @@ my_colors <- c(
 # dataframe that asspciates releases to dates
 libdates <- fread('csv/libdate.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)
 libdates$LIBVER <- paste(libdates$LIB, libdates$VER, sep='-')
-
-
+libdates <- transform(libdates, DATE = as.Date(as.character(YY), "%Y"))
+# count_df = df[LIB=="JEFF" & MAT==9225 , .(count=.N) , by="LIBVER,LIBVERORIG"]
 
 
 
