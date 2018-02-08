@@ -7,9 +7,33 @@
 
 shinyServer(function(input, output) {
 
+  ###############
+  dfu<-reactive({
+    # Create a Progress object
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    
+    progress$set(message = "Retrieving Data", value = 1/2)
+    
+    dfu<-filter(df, X==input$X, A==input$A, M==input$M, LIBVER==input$LIBVER)
+    validate(need(dim(dfu)[1]>0,"No data for this selection"))
+     
+    progress$set(message = "Filtering Data", value = 1)
+    dfu
+  })
+  
+  
+  
+  
+  
+  
+  
+  
   output$plot_map<-renderPlotly({ 
     
-    pdf<-filter(df, X==input$X, A==input$A, M==input$M, LIBVER==input$LIBVER)
+    #pdf<-filter(df, X==input$X, A==input$A, M==input$M, LIBVER==input$LIBVER)
+    pdf<-dfu()
     title<-paste(input$X,"-",input$A, "from ", input$LIBVER)
     
     axisfont <- list(
@@ -119,13 +143,47 @@ shinyServer(function(input, output) {
              yaxis=yaxis,
              xaxis=xaxis)
   })  
- })
 
 
+#### Compute differences in MFMT chuncks for two given library versions
 
+output$plot_diffs <- renderPlotly({
 
+  #keep only two libvers - isotope already selected in dfu reactive
+  pdf<-filter(dfu(), LIBVER==input$LIBVER1 || LIBVER==input$LIBVER2)
+  pdf<-subset(pdf, select = c('MF', 'MT', 'MFMT', 'LIBVER', 'LIBVERORIG'))
+  
+  # t is normally a 3 column dataframe :
+  t<-dcast(pdf, MFMT~LIBVER, value.var = 'LIBVERORIG')
+  setnames(t, old=c(names(t)[2],names(t)[3]), new=c("LIB1", "LIB2"))
+  
+  #replacing MF, MT columns :  
+  t<-merge(subset(dfu, select = c('MF', 'MT', 'MFMT')), t) 
+  
+  #keep only non N/A and identical occurrences
+  s<-t[t$LIB1==t$LIB2,]# s as in same
+  s<-filter(s, !is.na(s$LIB1)) 
+  
+  d<-t[t$LIB1!=t$LIB2,]
+  d<-filter(d, !is.na(d$LIB1)) # d as in different
+  
+  
 
+  g1<-ggplot(s, aes(MT, MF)) + geom_point()+
+    scale_x_discrete(drop=FALSE)+
+    scale_y_discrete(drop=FALSE)+ 
+    #scale_fill_manual(values=my_colors)+
+    theme_light() + 
+    theme(legend.title=element_blank(),  
+          plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
+          plot.margin = unit(c(0.7, 0, 2, 1), "cm")) #top, right, bottom, left
+  p<-ggplotly(g1)
+  p
+})
 
+ 
+})
+ 
 # dcount<-count(df, LIBVER, Z,X,A,M)
 # dcount$TOT_CHUNKS<-dcount$n
 # dcount$n<-NULL
