@@ -6,9 +6,10 @@
 #
  
 
-dtitle<-tagList(tags$img(src='dna-strand.png', height='40'))
+#dtitle<-tagList(tags$img(src='dna-strand.png', height='40'))
+dtitle<-c("ND DNA Mapping")
 
-header <- dashboardHeader(title=dtitle)
+  header <- dashboardHeader(title=dtitle)
 
 sidebar <- dashboardSidebar(disable = TRUE, width = 250)
 
@@ -52,8 +53,9 @@ body <- dashboardBody(
         ),
         fluidRow(
           column(12,
-                 plotlyOutput("plot_diffs", height = '600px')
-          )
+                 #plotlyOutput("diffs", height = '600px')
+                 dataTableOutput('diffs')
+                 )
         )
     ),#end box
     

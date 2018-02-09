@@ -123,7 +123,7 @@ shinyServer(function(input, output) {
 
 #### Compute differences in MFMT chuncks for two given library versions
 
-output$plot_diffs <- renderPlotly({
+output$diffs <- renderDataTable({
   #pdf<-dfu() 
   pdf<-filter(df, A==235)
   lib1<-subset(filter(pdf, LIBVER==input$LIBVER1),select = c('MF', 'MT','LIBVER', 'LIBVERORIG'))
@@ -136,14 +136,15 @@ output$plot_diffs <- renderPlotly({
   if(input$CHOICE=='2') s<-s
   if(input$CHOICE=='1') s<-d
     
-  g1<-ggplot() + geom_tile(data=s, aes(MT, MF))+
-    #scale_x_discrete(drop=FALSE)+
-    #scale_y_discrete(drop=FALSE)+  
-    theme_light() + 
-    theme(legend.title=element_blank(),  
-          plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
-          plot.margin = unit(c(0.7, 0, 2, 1), "cm")) #top, right, bottom, left
-  ggplotly(g1)
+  s
+  # g1<-ggplot() + geom_tile(data=s, aes(MT, MF))+
+  #   #scale_x_discrete(drop=FALSE)+
+  #   #scale_y_discrete(drop=FALSE)+  
+  #   theme_light() + 
+  #   theme(legend.title=element_blank(),  
+  #         plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
+  #         plot.margin = unit(c(0.7, 0, 2, 1), "cm")) #top, right, bottom, left
+  # ggplotly(g1)
   
 })
 
