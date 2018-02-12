@@ -1,0 +1,6 @@
+source("global.R")
+A <- df %>% group_by(MAT) %>% subset(LIBVER=="JEFF-3.2" & MFMT!=1451)
+B <- A %>% group_by(MAT) %>% summarize(NDIFF=n_distinct(LIBVERORIG)) %>% subset(NDIFF==1)
+C <- merge(A,B)
+UNIQUES <- unique(C[,c("MAT","LIBVERORIG")])
+print(UNIQUES)
