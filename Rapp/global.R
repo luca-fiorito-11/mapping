@@ -30,10 +30,21 @@ df <- fread('csv/testdata.csv', header = TRUE, sep = ",", stringsAsFactors = TRU
 mats <- fread('csv/matzsymam.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)  
 df <- merge(df, mats)
 df$MFMT <- paste(df$MF*1000+df$MT)
-df <- df[order(df$MFMT),]
+
+mts<-fread('csv/MTs.csv',header = TRUE, sep = ",", stringsAsFactors = TRUE)
+mfs<-fread('csv/MF.csv',header = TRUE, sep = ",", stringsAsFactors = TRUE)
+
+df<-merge(df, mfs, by = "MF")
+df<-merge(df, mts, by = "MT")
+
+
+
 # add fields release (LIBVER) and origin release (LIBVERORIG)
 df$LIBVERORIG <- paste(df$LIBORIG, df$VERORIG, sep='-')
 df$LIBVER <- paste(df$LIB, df$VER, sep='-')
+
+df$SYMA<-paste(df$X,"-",df$A)
+df <- df[order(df$X),]
 
 df$MF <- factor(df$MF)
 df$MT <- factor(df$MT)
