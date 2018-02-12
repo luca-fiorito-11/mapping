@@ -1,0 +1,22 @@
+---
+title: "Libraries Contingency Table"
+author: "L. Fiorito and F. Michel-Sendis"
+# date: "12 February 2018"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r source, include=FALSE, cache = TRUE}
+source("global.R")
+```
+
+```{r table}
+A <- table(df[,c("LIBVER","LIBVERORIG")])
+knitr::kable(A)
+```
+
