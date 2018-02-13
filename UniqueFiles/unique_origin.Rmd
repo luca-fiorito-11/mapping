@@ -1,0 +1,62 @@
+---
+title: "Files with unique origin"
+author: "L. Fiorito and F. Michel-Sendis"
+# date: "13 February 2018"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+params:
+  RELEASE: "JEFF-3.3"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r source, include=FALSE, cache = TRUE}
+source("unique_origin.R")
+UNIQUES <- UNIQUES[,c(4,5,6,7,1,2,3)] %>%
+  subset(LIBVER==params$RELEASE) # filter by release
+```
+
+# `r params$RELEASE`
+
+Row {data-height=200}
+-------------------------------------
+
+### Description
+
+List of the **`r params$RELEASE`** evaluated files for which all sections are either new or copied from an existing nuclear data library release.
+
+The isotopes in <span style="backgroundcolor:green;">green</span> correspond to new evaluated files.
+
+### evaluations found
+```{r, fig.width=2}
+flexdashboard::valueBox(nrow(UNIQUES), icon = "fa-file")
+```
+
+
+Row {data-height=800}
+-------------------------------------
+
+### Table
+```{r table}
+library(knitr)
+library(kableExtra)
+library(dplyr)
+UNIQUES %>% mutate( # add specifications to cells in column LIBVERORIG
+    LIBVERORIG = cell_spec(LIBVERORIG, 
+                       "html",
+                       bold = ifelse(LIBVERORIG==LIBVER,T,F),
+                       background = ifelse(LIBVERORIG==LIBVER,"green",""), 
+                       color = ifelse(LIBVER==LIBVERORIG,"white",""))
+    #extra_css = ifelse(A==20, "background-color: #666; color: #fff;", ""))
+    ) %>%
+  subset(select = -LIBVER) %>% # remove LIBVER
+  kable("html", escape = F, align = 'c') %>%
+  kable_styling("striped", full_width = T)# %>%
+  # row_spec(1:10, bold = T, color = "white", background = ifelse(A==20,"#D7261E","#fff"))
+  # row_spec(:, bold = T, color = "white", background = "#D7261E")
+# UNIQUES %>% subset(LIBVER=="JEFF-3.2") %>% kable()
+```
+
