@@ -13,13 +13,15 @@ params:
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
+Page 1
+=====================================
+
 ```{r source, include=FALSE, cache = TRUE}
+library(flexdashboard)
 source("unique_origin.R")
 UNIQUES <- UNIQUES[,c(4,5,6,7,1,2,3)] %>%
   subset(LIBVER==params$RELEASE) # filter by release
 ```
-
-# `r params$RELEASE`
 
 Row {data-height=200}
 -------------------------------------
@@ -40,7 +42,7 @@ Row {data-height=800}
 -------------------------------------
 
 ### Table
-```{r table}
+```{r table-unique}
 library(knitr)
 library(kableExtra)
 library(dplyr)
@@ -58,5 +60,81 @@ UNIQUES %>% mutate( # add specifications to cells in column LIBVERORIG
   # row_spec(1:10, bold = T, color = "white", background = ifelse(A==20,"#D7261E","#fff"))
   # row_spec(:, bold = T, color = "white", background = "#D7261E")
 # UNIQUES %>% subset(LIBVER=="JEFF-3.2") %>% kable()
+```
+
+```{r filter, include=FALSE}
+C <- plyr::count(df[df$LIBVER==params$RELEASE,], 'LIBVERORIG')
+C <- transform(C, percent = scales::percent(freq / sum(freq)))
+C <- C[rev(order(C$LIBVERORIG)),]
+```
+
+
+Page 2
+=====================================
+
+Row {data-height=200}
+-------------------------------------
+
+### Description
+
+MF/MT breakdown of the **`r strsplit(params$RELEASE, "-")[[1]][1]`** library, version **`r strsplit(params$RELEASE, "-")[[1]][2]`**.
+
+Each slide of the <span style="color:blue">pie chart</span> represents the amount of MF/MT sections (in percent) that originates from a given nuclear data library release.
+
+The same information is reported in the <span style="color:blue">table</span> in absolute (**COUNT**) and percent (**PERCENT**) values.
+
+> **Example:** `r max(C$freq)` MF/MT sections of `r params$RELEASE` are taken from `r C[which.max(C$freq),]$LIBVERORIG`
+
+Row {data-height=800}
+-------------------------------------
+
+### Pie Chart
+```{r piechart}
+library(plotly)
+library(ggplot2)
+# midpoint <- cumsum(C$freq) - C$freq/2
+# Pie_Chart <- ggplot(C, aes(x=1,y=freq, fill=LIBVERORIG)) +
+#   geom_bar(stat="identity") +
+#   coord_polar(theta='y') +
+#   scale_fill_manual(values=my_colors) +
+#   labs(fill="LIBRARY", y="", x="") +
+#   scale_y_continuous(breaks=midpoint, labels=C$percent) +
+#   theme_light() +
+#   theme(plot.title=element_text(size=20, vjust=1),
+#         plot.background=element_rect(fill="white"),
+#         axis.ticks=element_blank(),
+#         axis.title=element_blank(),
+#         axis.text.y=element_blank(),
+#         axis.text.x=element_text(color='black',size=12),
+#         plot.margin = unit(c(0.7, 0, 2, 1), "cm")) #top, right, bottom, left
+# ggplotly(Pie_Chart)
+Pie_Chart <- plot_ly(C, labels = ~LIBVERORIG, values = ~freq, type = 'pie',
+                     # textposition = 'inside',
+                     # textinfo = 'label+percent',
+                     # insidetextfont = list(color = '#FFFFFF'),
+                     # hoverinfo = 'text',
+                     # text = ~paste('$', LIBVERORIG, ' billions'),
+                     # marker = list(colors = my_colors,
+                     #               line = list(color = '#FFFFFF', width = 1)),
+                     # The 'pull' attribute can also be used to create space between the sectors
+                     showlegend = F) %>%
+  layout(xaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE),
+         yaxis = list(showgrid = FALSE, zeroline = FALSE, showticklabels = FALSE))
+# Must call Pie_Chart to show it in Dashboard
+Pie_Chart
+```
+
+
+### Table
+```{r table-breakdown}
+C %>% DT::datatable(rownames=FALSE,
+                    colnames=c("LIBRARY","COUNT","PERCENT"),
+                    options = list(
+                      autowidth = TRUE,
+                      order = list(1, 'desc'),
+                      pageLength = 100,
+                      columnDefs = list(list(className = 'dt-center', targets = 1:2)),
+                      sDom="rt")
+                    )
 ```
 
