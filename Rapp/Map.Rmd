@@ -3,16 +3,12 @@ title: "Nuclear Data Mapping"
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
-    theme : readable #spacelab
+    theme : sandstone #readable #spacelab
     logo: logo.jpg
     #css: mystyles.css
 params:
-  X : "U"
-  A : "238"
-  SYMA: "U - 238"
-  M : "g"
-  LIBVER: "JEFF-3.3" 
-  LIBVER2: "JEFF-3.2"
+  SYMAMLIBVER: "U-238-g-JEFF-3.2"
+  LIBVER2: "JEFF-3.1"
   
 ---
 <style>                     
@@ -21,7 +17,7 @@ params:
   border-color:gray;
 }
 .navbar-brand {
-color:black!important;
+color:DarkSlateGray!important;
 }
 .dataTables_wrapper{
 font-family: helvetica;
@@ -31,42 +27,21 @@ font-size: 11px;
 
 ```{r setup}
 knitr::opts_chunk$set(echo = FALSE)
+source('global.R')  
+myparams<-strsplit(params$SYMAMLIBVER, "-")[[1]]
+mX<-myparams[1]
+mA<-myparams[2]
+mM<-myparams[3]
+mLIB<-myparams[4]
+mVER<-myparams[5]
+
+mSYMAM<-paste(mX,"-", mA,"-",mM, sep ="")
+mLIBVER<-paste(mLIB,"-",mVER, sep = "")
+
+output_dir<-paste(mLIB,mVER, sep = "")
+output_file<-paste(mX,mA,mM)
+
 ```
-
-```{r source, include=FALSE, cache = TRUE}
-source('global.R') 
-
-library("flexdashboard")
-
-my_colors <- c(
-  "JEFF-3.3"="#097C28",
-  "JEFF-3.2"="#72FD7A",
-  "JEFF-3.1.2"="#2CA743",
-  "JEFF-3.1.1"="#3DBC51",
-  "JEFF-3.1"="#4FD25E",
-  "JEFF-3.0"="#60E76C",
-  "JEFF-2.2"="#46f0f0",
-  "JENDL-4.0"="#ff1493",
-  "JENDL-3.3"="#ffc0cb",
-  "JENDL-3.2"="#ffb6c1",
-  "ENDFB-8.0"="#FFC129",
-  "ENDFB-7.1"="#FADB32",
-  "ENDFB-7.0"="#F5F63C",
-  "ENDFB-6.8"="#F4F50A",
-  "TENDL-2017"="#aa6e28",
-  "TENDL-2016"="#fffac8",
-  "TENDL-2015"="#800000",
-  "TENDL-2014"="#aaffc3",
-  "TENDL-2013"="#808000",
-  "TENDL-2012"="#ffd8b1",
-  "TENDL-2011"="#000080",
-  "TENDL-2010"="#808080",
-  "TENDL-2009"="#000000"
-  )
-```
-
-
-
 
 Graph
 =====================================  
@@ -75,11 +50,9 @@ Row {}
 -------------------------------------
 ### {data-width=800}
 
- 
-
-### (December 2017){data-width=200}
+###  {data-width=200}
 ```{r} 
-flexdashboard::valueBox("jeff 3.3", icon="fa-folder", href="https://www.oecd-nea.org", color="#097C28")
+flexdashboard::valueBox(mLIBVER, icon="fa-folder", href="https://www.oecd-nea.org", color=as.character(my_colors[mLIBVER]), caption = paste(" Release : ", libdates[mLIBVER]))
 
 ```   
 
@@ -89,15 +62,11 @@ Row {}
 ### MF, MT Mapping of ENDF6 file according to MF-MT Origin {data-height=2500}
 
 ```{r plotmap}
-library(ggplot2)
-library(plotly)
-
-
 ##plot_map : 
+     
+    pdf<-df%>%subset(X==mX & A==mA & M==mM & LIBVER==mLIBVER)
     
-    pdf<-filter(df, X==params$X, A==params$A, M==params$M, LIBVER==params$LIBVER)
-    #pdf<-df_iso_lib()
-    title<-paste(params$SYMA," from ", params$LIBVER)
+    title<-paste(mSYMAM," from ", mLIBVER)
     
     axisfont <- list(
       family = "Helvetica",
@@ -115,28 +84,37 @@ library(plotly)
       showgrid = TRUE,
       tickangle=80
     )
-       
-    g1<-ggplot(pdf, aes(MT, MF)) + geom_tile(aes(fill=LIBVERORIG)) +
-      scale_y_discrete(drop=FALSE)+ 
+    
+    #changing column names for better readability in tooltip : 
+    setnames(pdf, old=c("MFDES","MTDES", "LIBVERORIG"), new=c("Type","Reaction", "Matches"))
+    
+    g1<-ggplot(pdf, aes(x=MT, y=MF, Type=Type, Reaction=Reaction)) + 
+      geom_tile(aes(fill=Matches)) +
+      #geom_tile() +
+      scale_y_discrete(drop=FALSE) + 
       scale_fill_manual(values=my_colors)+
       theme_light() + 
-      theme(legend.title=element_blank(),  
+      theme(legend.title=element_blank(), 
             plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
             plot.margin = unit(c(0.7, 0, 2, 1), "cm")) #top, right, bottom, left
-    
-     
-    
-    p<-ggplotly(g1, width = 1200, height = 500)
+    p<-ggplotly(g1, width = 1200, 
+                height = 500
+                #tooltip = c("MF", "MFDES", "MT")
+                )
+    #print(g1)
     
     p%>%config(displayModeBar = 'pan',showLink=FALSE,senddata=FALSE,editable=FALSE,
                  displaylogo=FALSE, collaborate=FALSE, cloud=FALSE,
                  modeBarButtonsToRemove=c('select2d', 'lasso2d','hoverClosestCartesian',
                                           'hoverCompareCartesian'))%>%
-      layout(title=title, autosize = F,  
-             yaxis=yaxis , xaxis=xaxis)
-   
-    p 
-    
+      layout(title=title,
+             autosize = F,
+             yaxis=yaxis ,
+             xaxis=xaxis ,
+             showlegend = TRUE
+             )
+   p
+
 ```
    
 
@@ -150,39 +128,43 @@ Row {}
 
  
 
-### (December 2017){data-width=200}
+###  {data-width=200}
 ```{r} 
-flexdashboard::valueBox("jeff 3.3", icon="fa-folder", href="https://www.oecd-nea.org", color="#00cc99")
+flexdashboard::valueBox(mLIBVER, icon="fa-folder", href="https://www.oecd-nea.org", color=as.character(my_colors[mLIBVER]), caption = paste(" Release : ", libdates[mLIBVER]))
 
 ```   
 
 Row {}
 -------------------------------------
 
-### **Different** data to previous release (JEFF-3.2)
+### Comparison of **different** data to other release (`r params$LIBVER2`)
 
 ```{r} 
 
-  library(DT) 
-
-  pdf<-filter(df, X==params$X, A==params$A, M==params$M)
-
-  df<-filter(df, X=="U", A=="235", M=="g")
+  #pdf<-filter(df, X==mX, A==mA, M==mM)
+  pdf<-df%>%subset(X==mX & A==mA & M==mM)
   
-  lib1<-subset(filter(pdf, LIBVER==params$LIBVER),select = c('MF', 'MFDES', 'MT', "MTDES", 'LIBVER', 'LIBVERORIG'))
-  lib2<-subset(filter(pdf, LIBVER==params$LIBVER2),select = c('MF', 'MFDES', 'MT', "MTDES", 'LIBVER', 'LIBVERORIG'))
+  lib1<-pdf%>%subset(LIBVER==mLIBVER)
+  lib2<-pdf%>%subset(LIBVER==params$LIBVER2)
+  
+  lib1<-subset(lib1,select = c('MF', 'MFDES', 'MT', "MTDES", 'LIBVER', 'LIBVERORIG'))
+  lib2<-subset(lib2,select = c('MF', 'MFDES', 'MT', "MTDES", 'LIBVER', 'LIBVERORIG'))
   comp<-merge(lib1, lib2, by = c('MF', 'MFDES', 'MT', "MTDES"))
   
   data.table::setnames(comp, old=c("LIBVERORIG.x","LIBVERORIG.y"), new=c("LIB1","LIB2"))
   data.table::setnames(comp, old=c("MFDES","MTDES"), new=c("MF TYPE","MT TYPE"))
   
-  comp<-subset(comp,
-               select = c('MF TYPE', 'MT TYPE', 'MF', 'MT', 'LIB1', 'LIB2'))
+  comp<-subset(comp, select = c('MF TYPE', 'MT TYPE', 'MF', 'MT', 'LIB1', 'LIB2'))
   
-  d<-filter(comp, LIB1!=LIB2) # diff occurrences 
-  
-  data.table::setnames(d, old=c("LIB1","LIB2"), new=c(params$LIBVER,params$LIBVER2))
-  datatable(d, options = list(pageLength=50))
+  #d<-filter(comp, LIB1!=LIB2) # diff occurrences 
+  d<-comp%>%subset(LIB1!=LIB2) # diff occurrences 
+  data.table::setnames(d, old=c("LIB1","LIB2"), new=c(mLIBVER,params$LIBVER2))
+  datatable(d, filter='top', options = list(
+    pageLength=50,
+    rownames=FALSE,
+    autowidth=FALSE,
+    columnDefs=list(list(className='dt-center', targets=0:6))
+    ))
   
 
 ```
