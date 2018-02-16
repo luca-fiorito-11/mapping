@@ -8,7 +8,8 @@
 shinyServer(function(input, output) {
 
   ###############
-  dfu<-reactive({
+  
+  df_iso<-reactive({
     # Create a Progress object
     progress <- shiny::Progress$new()
     # Make sure it closes when we exit this reactive, even if there's an error
@@ -16,7 +17,22 @@ shinyServer(function(input, output) {
     
     progress$set(message = "Retrieving Data", value = 1/2)
     
-    dfu<-filter(df, X==input$X, A==input$A, M==input$M, LIBVER==input$LIBVER)
+    dfi<-filter(df, SYMA==input$SYMA, M==input$M)
+    validate(need(dim(dfi)[1]>0,"No data for this selection"))
+    
+    progress$set(message = "Filtering Data", value = 1)
+    dfi
+  })
+  
+  df_iso_lib<-reactive({
+    # Create a Progress object
+    progress <- shiny::Progress$new()
+    # Make sure it closes when we exit this reactive, even if there's an error
+    on.exit(progress$close())
+    
+   # progress$set(message = "Retrieving Data", value = 1/2)
+    
+    dfu<-filter(df_iso(), LIBVER==input$LIBVER)
     validate(need(dim(dfu)[1]>0,"No data for this selection"))
      
     progress$set(message = "Filtering Data", value = 1)
@@ -24,17 +40,11 @@ shinyServer(function(input, output) {
   })
   
   
-  
-  
-  
-  
-  
-  
   output$plot_map<-renderPlotly({ 
     
     #pdf<-filter(df, X==input$X, A==input$A, M==input$M, LIBVER==input$LIBVER)
-    pdf<-dfu()
-    title<-paste(input$X,"-",input$A, "from ", input$LIBVER)
+    pdf<-df_iso_lib()
+    title<-paste(input$SYMA," from ", input$LIBVER)
     
     axisfont <- list(
       family = "Helvetica",
@@ -54,34 +64,18 @@ shinyServer(function(input, output) {
       showgrid = TRUE,
       tickangle=80
     )
-     
-    
-    #pdf1<-filter(pdf, as.integer(MT)<=70)
-    #pdf2<-filter(pdf, as.integer(MT)>70)
-     
-    
-    # g1<-ggplot(pdf, aes(x=MT, y=MF)) + 
-    #   geom_point(shape=15, size=3, aes(fill = LIBVERORIG)) + 
-    #  # coord_flip() + 
-    #   scale_fill_discrete(name="Origin", drop=FALSE)+ 
-    #   scale_x_discrete(drop=FALSE)+
-    #   scale_y_discrete(drop=FALSE)+ 
-    #   theme_light() + 
-    #   theme(legend.title=element_blank(),  
-    #         plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
-    #         plot.margin = unit(c(0.7, 0, 2, 1), "cm")) #top, right, bottom, left
-    
+       
     g1<-ggplot(pdf, aes(MT, MF)) + geom_tile(aes(fill=LIBVERORIG)) +
-      scale_x_discrete(drop=FALSE)+
       scale_y_discrete(drop=FALSE)+ 
       scale_fill_manual(values=my_colors)+
       theme_light() + 
       theme(legend.title=element_blank(),  
             plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
             plot.margin = unit(c(0.7, 0, 2, 1), "cm")) #top, right, bottom, left
-    p<-ggplotly(g1)
     
-    # p<-subplot(p1, p2, nrows = 2, shareX = FALSE)
+    if(input$ALLMT==1) g1<-g1+ scale_x_discrete(drop=FALSE)
+    
+    p<-ggplotly(g1)
     
     p%>%config(displayModeBar = 'pan',showLink=FALSE,senddata=FALSE,editable=FALSE,
                  displaylogo=FALSE, collaborate=FALSE, cloud=FALSE,
@@ -156,62 +150,53 @@ shinyServer(function(input, output) {
 
 #### Compute differences in MFMT chuncks for two given library versions
 
-output$plot_diffs <- renderPlotly({
-
-  #keep only two libvers - isotope already selected in dfu reactive
-  pdf<-filter(dfu(), LIBVER==input$LIBVER1 || LIBVER==input$LIBVER2)
-  pdf<-subset(pdf, select = c('MF', 'MT', 'MFMT', 'LIBVER', 'LIBVERORIG'))
+output$diffs <- renderDataTable({
   
-  # t is normally a 3 column dataframe :
-  t<-dcast(pdf, MFMT~LIBVER, value.var = 'LIBVERORIG')
-  setnames(t, old=c(names(t)[2],names(t)[3]), new=c("LIB1", "LIB2"))
+  pdf<-df_iso()  
   
-  #replacing MF, MT columns :  
-  t<-merge(subset(dfu, select = c('MF', 'MT', 'MFMT')), t) 
+  lib1<-subset(filter(pdf, LIBVER==input$LIBVER1),select = c('MF', 'MFDES', 'MT', "MTDES", 'LIBVER', 'LIBVERORIG'))
+  lib2<-subset(filter(pdf, LIBVER==input$LIBVER2),select = c('MF', 'MFDES', 'MT', "MTDES", 'LIBVER', 'LIBVERORIG'))
+  comp<-merge(lib1, lib2, by = c('MF', 'MFDES', 'MT', "MTDES"))
   
-  #keep only non N/A and identical occurrences
-  s<-t[t$LIB1==t$LIB2,]# s as in same
-  s<-filter(s, !is.na(s$LIB1)) 
+  setnames(comp, old=c("LIBVERORIG.x","LIBVERORIG.y"), new=c("LIB1","LIB2"))
+  setnames(comp, old=c("MFDES","MTDES"), new=c("MF TYPE","MT TYPE"))
   
-  d<-t[t$LIB1!=t$LIB2,]
-  d<-filter(d, !is.na(d$LIB1)) # d as in different
+  comp<-subset(comp,
+               select = c('MF TYPE', 'MT TYPE', 'MF', 'MT', 'LIB1', 'LIB2'))
   
+  d<-filter(comp, LIB1!=LIB2) # diff occurrences
+  s<-filter(comp, LIB1==LIB2) # same occurrences
   
-
-  g1<-ggplot(s, aes(MT, MF)) + geom_point()+
-    scale_x_discrete(drop=FALSE)+
-    scale_y_discrete(drop=FALSE)+ 
-    #scale_fill_manual(values=my_colors)+
-    theme_light() + 
-    theme(legend.title=element_blank(),  
-          plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
-          plot.margin = unit(c(0.7, 0, 2, 1), "cm")) #top, right, bottom, left
-  p<-ggplotly(g1)
-  p
+  setnames(d, old=c("LIB1","LIB2"), new=c(input$LIBVER1,input$LIBVER2))
+  setnames(s, old=c("LIB1","LIB2"), new=c(input$LIBVER1,input$LIBVER2))
+  
+  if('All'%in%input$MF || is.na(input$MF)) 
+  {
+    if(input$CHOICE=='2') s
+    else if(input$CHOICE=='1') d
+  }
+  else if (!is.na(input$MF))
+  {
+    if(input$CHOICE=='2') filter(s, MF%in%input$MF)
+    else if(input$CHOICE=='1') filter(d, MF%in%input$MF)
+  }
+   
+  # g1<-ggplot() + geom_tile(data=s, aes(MT, MF))+
+  #   #scale_x_discrete(drop=FALSE)+
+  #   #scale_y_discrete(drop=FALSE)+  
+  #   theme_light() + 
+  #   theme(legend.title=element_blank(),  
+  #         plot.background=element_rect(fill="white"), #can be 'darkseagreen' too...
+  #         plot.margin = unit(c(0.7, 0, 2, 1), "cm")) #top, right, bottom, left
+  # ggplotly(g1)
+  
 })
 
  
 })
  
-# dcount<-count(df, LIBVER, Z,X,A,M)
-# dcount$TOT_CHUNKS<-dcount$n
-# dcount$n<-NULL
-# df<-merge(df, dcount)
-# 
-# dcount<-count(df, Z, X, A, M, LIBVER, LIBVERORIG, TOT_CHUNKS)
-# dcount$N_CHUNKS<-dcount$n
-# dcount$n<-NULL
-# dcount$ORIG_PCT<-round(dcount$N_CHUNKS/dcount$TOT_CHUNKS*100,1) # keep 1 decimal place
-# 
-# 
-# dcount2<-count(df, Z, X, A, M,LIBVER, MF)
-# dcount2$TOT_MT_IN_MF<-dcount2$n
-# dcount2$n<-NULL
-# 
-# dcount3<-count(df, Z, X, A, M,LIBVER, LIBVERORIG, MF)
-# dcount3$N_MTLIBVER_IN_MF<-dcount3$n
-# dcount3$n<-NULL
-# 
-# dcount2<-merge(dcount2, dcount3)
-# dcount3<-NULL
-# dcount2$PCT_MT_IN_MF<-round(dcount2$N_MTLIBVER_IN_MF/dcount2$TOT_MT_IN_MF,1)*100
+
+#  Command for saving local html :
+#  htmlwidgets::saveWidget(as_widget(p), "test.html")
+
+ 

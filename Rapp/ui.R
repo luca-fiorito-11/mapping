@@ -6,9 +6,10 @@
 #
  
 
-dtitle<-tagList(tags$img(src='dna-strand.png', height='40'))
+#dtitle<-tagList(tags$img(src='dna-strand.png', height='40'))
+dtitle<-c("ND DNA Mapping")
 
-header <- dashboardHeader(title=dtitle)
+  header <- dashboardHeader(title=dtitle)
 
 sidebar <- dashboardSidebar(disable = TRUE, width = 250)
 
@@ -22,12 +23,18 @@ body <- dashboardBody(
     #tabBox(title=tagList(shiny::icon("bug")), #height = '1000px',
            #tabPanel(tag('h4',"Overview"),    
     fluidRow(
-      column(3,selectInput('LIBVER',tag('h4', 'Library'),choices = unique(df$LIBVER),multiple=FALSE, 
+      column(2,selectInput('LIBVER',tag('h4', 'Library'),choices = unique(df$LIBVER),multiple=FALSE, 
                            selected ="JEFF-3.3")),
-      column(3,selectInput('X',tag('h4', 'Element'),choices = unique(df$X),multiple=FALSE)),
-      column(3,selectInput('A',tag('h4', 'Mass Number'),choices = unique(df$A),multiple=FALSE, selected="238")),
-      column(3,selectInput('M',tag('h4', 'Isomer'),choices = unique(df$M),multiple=FALSE, selected="g"))
+      column(2,selectInput('SYMA',tag('h4', 'Element'),choices = unique(df$SYMA), selected="U - 238", multiple=FALSE)),
+      #column(3,selectInput('A',tag('h4', 'Mass Number'),choices = unique(df$A),multiple=FALSE, selected="238")),
+      column(2,selectInput('M',tag('h4', 'Isomer'),choices = unique(df$M),multiple=FALSE, selected="g")),
+      
+      column(2,radioButtons('ALLMT',tag('h5', "Display all MT categories"),
+                            list("Yes" = 1, "No" = 2), 
+                            selected = 2, inline = TRUE))
+      
     ),
+    
     fluidRow(
       column(12,
              plotlyOutput("plot_map", height = '500px')
@@ -35,6 +42,29 @@ body <- dashboardBody(
       ) 
     ),#end box
      
+    
+    box(title = tag('b', "Compare"), status="warning", collapsible = TRUE,# collapsed=TRUE,
+        width = 12,
+        fluidRow( 
+          column(2,selectInput('MF',tag('h4', 'Select MF'),choices = c('All', unique(df$MF)), selected='All',
+                               multiple=TRUE)),
+         
+          column(2,selectInput('LIBVER1',tag('h4', 'Library 1'),choices = unique(df$LIBVER),multiple=FALSE, 
+                               selected ="JEFF-3.3")),
+          column(2,selectInput('LIBVER2',tag('h4', 'Library 2'),choices = unique(df$LIBVER),multiple=FALSE, 
+                               selected ="JEFF-3.2")),
+          column(3, 
+                 radioButtons('CHOICE', label = h4("Display :"),
+                              choices = list("Different MF/MT" = 1, "Identical MF/MT" = 2), 
+                              selected = 1,inline = TRUE))),
+        fluidRow(
+          column(12,
+                 #plotlyOutput("diffs", height = '600px')
+                 dataTableOutput('diffs')
+                 )
+        )
+    ),#end box
+    
    # Box for the DNA evolution of an evaluated file
    box(title = tag('b', "Evolution"), status="warning", collapsible = TRUE,# collapsed=TRUE,
        width = 12,
@@ -64,37 +94,9 @@ body <- dashboardBody(
                 plotlyOutput("tempPlot", height = '500px')
          )
        )
-   ),#end box,
-
-   
-   box(title = tag('b', "Compare"), status="warning", collapsible = TRUE,# collapsed=TRUE,
-       width = 12,
-       fluidRow(
-         column(3,selectInput('LIBVER1',tag('h4', 'Library 1'),choices = unique(df$LIBVER),multiple=FALSE, 
-                              selected ="JEFF-3.3")),
-         column(3,selectInput('LIBVER2',tag('h4', 'Library 2'),choices = unique(df$LIBVER),multiple=FALSE, 
-                              selected ="JEFF-3.2"))
-         
-       ),
-       fluidRow(
-         column(12,
-                plotlyOutput("plot_diffs", height = '600px')
-         )
-       )
    )#end box
-   
    )# end fluidPage
   )# end dashboardbody
-
-
-
-
-
-
-
-
-
-
 
 
 
