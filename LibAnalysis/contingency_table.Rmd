@@ -9,14 +9,69 @@ output:
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
+library(flexdashboard)
+library(knitr)
+library(dplyr)
+library(kableExtra)
 ```
 
 ```{r source, include=FALSE, cache = TRUE}
 source("global.R")
 ```
 
-```{r table}
-A <- table(df[,c("LIBVER","LIBVERORIG")])
-knitr::kable(A)
+
+```{r matrices}
+matrix <- subset(df, select=c("LIBVER","LIBVERORIG")) %>% 
+  table() %>% 
+  as.data.frame.matrix()
+rmatrix <- round(matrix/rowSums(matrix)*100, 1) %>%
+  apply(c(1,2), function(x)
+    ifelse(
+      x > 75, cell_spec(x, "html", background = "red", color = "white", bold = T),
+      ifelse(
+        x > 50, cell_spec(x, "html", background = "yellow", color = "black", bold = T),
+        ifelse(
+          x > 25, cell_spec(x, "html", background = "green", color = "white", bold = T),
+          x
+          )
+        )
+      )
+    )
 ```
 
+Row {data-height=200}
+-------------------------------------
+
+### Description
+
+
+Row {data-height=800 .tabset .tabset-fade}
+-------------------------------------
+
+### Percent
+
+```{r relative}
+library(DT)
+datatable(rmatrix, escape = F, options = list(
+  dom = 'ft',
+  columnDefs = list(list(className = 'dt-center')),
+  initComplete = JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#1414f7', 'color': '#fff'});",
+    "}")
+  ))
+```
+
+### Absolute
+
+```{r absolute}
+library(DT)
+datatable(matrix, escape = F, options = list(
+  dom = 'ft',
+  columnDefs = list(list(className = 'dt-center')),
+  initComplete = JS(
+    "function(settings, json) {",
+    "$(this.api().table().header()).css({'background-color': '#1414f7', 'color': '#fff'});",
+    "}")
+  ))
+```
