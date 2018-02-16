@@ -4,7 +4,9 @@ output:
   flexdashboard::flex_dashboard:
     orientation: rows
     theme : sandstone #readable #spacelab
-    logo: logo.jpg
+    logo: www/logo.jpg
+    includes:
+      after_body: footer.html
     #css: mystyles.css
 params:
   SYMAMLIBVER: "U-238-g-JEFF-3.2"
@@ -114,7 +116,7 @@ Row {}
              showlegend = TRUE
              )
    p
-
+   #plotly_IMAGE(p, format = "png", out_file = "plotmap.png")
 ```
    
 

@@ -23,7 +23,7 @@ library(rmarkdown)
 library(flexdashboard)
 
 # set environment variable to pass proxy
-Sys.setenv(HTTPS_PROXY="http://proxy-vip1.oecd-nea.org:3128")
+#Sys.setenv(HTTPS_PROXY="http://proxy-vip1.oecd-nea.org:3128")
 
 df <- fread('csv/testdata.csv', header = TRUE, sep = ",", stringsAsFactors = FALSE)
 # mats contains 562 (JEFF.33 correspondences between MAT and Z,A,M)
