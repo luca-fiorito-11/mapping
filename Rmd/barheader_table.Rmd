@@ -1,0 +1,51 @@
+Row {}
+-------------------------------------
+
+### {data-width=200}
+
+```{r } 
+flexdashboard::valueBox(mLIBVER, icon="fa-folder-open-o", href="https://www.oecd-nea.org", color=as.character(my_colors[mLIBVER]), caption = paste(" Released in ", libdates[mLIBVER]))
+
+```   
+
+### {data-width=160}
+
+```{r } 
+flexdashboard::valueBox(mSYMAM, color="Gainsboro", caption = "Neutron File", icon="fa-file-o",
+                        href="#map"
+                        )
+
+```   
+
+### {data-width=160}
+
+```{r } 
+flexdashboard::valueBox(tot, color="Gainsboro", caption = "Sections in file", icon="fa-clone")
+
+```   
+
+### {data-width=160}
+
+```{r } 
+flexdashboard::valueBox(totalupdated, color=UpdatedColor, caption = "Updated sections", icon="fa-chevron-up")
+
+```   
+
+### {data-width=160}
+
+```{r } 
+flexdashboard::valueBox(newinlib1, color=NewColor, caption = "New sections", icon="fa-chevron-up")
+
+```   
+
+### {data-width=160}
+
+```{r } 
+flexdashboard::valueBox(erasedfromlib2, color=ErasedColor, caption = "Erased sections", icon="fa-chevron-down")
+
+```   
+
+Row {}
+-------------------------------------
+
+
