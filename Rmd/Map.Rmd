@@ -31,9 +31,60 @@ font-size: 11px;
 
 ```{r sourcing global.R}
 knitr::opts_chunk$set(echo = FALSE)
-source('global_vars.R')  
 
-setwd('../Rmd/')
+
+source("global.R")
+
+#define parameters to be used here : 
+myparams<-strsplit(params$SYMAMLIBVER, "-")[[1]]
+ 
+mX<-myparams[1]
+mA<-myparams[2]
+mM<-myparams[3]
+mLIB<-myparams[4]
+mVER<-myparams[5]
+mSYMAM<-paste(mX,"-", mA,"-",mM, sep ="")
+mLIBVER<-paste(mLIB,"-",mVER, sep = "")
+
+#for use by wrapper.R : 
+output_dir<-paste(mLIB,mVER, sep = "")
+output_file<-paste(mX,mA,mM)
+
+#for use by datatables :
+pdf<-df%>%subset(X==mX & A==mA & M==mM & LIBVER==mLIBVER)
+tot<-dim(pdf)[1]
+
+# preparing datatables
+pdfo<-df%>%subset(X==mX & A==mA & M==mM)
+lib2<-pdfo%>%subset(LIBVER==params$LIBVER2, 
+                    select = c('MFMT', 'MF', 'MFDES', 'MT', "MTDES", 'LIBVER', 'LIBVERORIG'))
+lib1<-pdfo%>%subset(LIBVER==mLIBVER,
+                    select = c('MFMT', 'MF', 'MFDES', 'MT', "MTDES", 'LIBVER', 'LIBVERORIG'))
+comp<-merge(lib1, lib2, by = c('MFMT', 'MF', 'MFDES', 'MT', "MTDES"), all=TRUE)
+data.table::setnames(comp, old=c("LIBVERORIG.x","LIBVERORIG.y"), new=c("LIB1","LIB2"))
+data.table::setnames(comp, old=c("MFDES","MTDES"), new=c("MF TYPE","MT TYPE"))
+comp<-subset(comp, select = c('MF TYPE', 'MT TYPE', 'MF', 'MT', 'LIB1', 'LIB2'))
+
+#counting : 
+totalupdated<-dim(comp%>%subset(LIB1!=LIB2 | is.na(LIB1) | is.na(LIB2)))[1]
+totunchanged<-dim(comp%>%subset(LIB1==LIB2))[1]
+newinlib1<-dim(comp%>%subset(is.na(LIB2)))[1]
+erasedfromlib2<-dim(comp%>%subset(is.na(LIB1)))[1]
+
+comp[is.na(comp)] <- 'NA'
+
+UpdatedColor <-"Gray"
+NewColor <-"Gray"
+ErasedColor <-"Gray"
+if(totalupdated > 0) UpdatedColor <- "#b3ffb3"
+if(newinlib1 > 0) NewColor <- "#b3ffb3"
+if(erasedfromlib2> 0) ErasedColor <- "#ffb3b3"
+
+LIBLINK <-"https://www.oecd-nea.org/dbdata"
+
+
+
+
 ```
 
 MF/MT Map
@@ -106,7 +157,7 @@ Updated
 ```{r child='barheader_table.Rmd'}
 ```
 
-### Updated 
+### **Updated** 
 
 Origin of **updated** sections in `r mLIBVER` file,  with respect to reference : `r params$LIBVER2`  
 
@@ -125,15 +176,44 @@ Origin of **updated** sections in `r mLIBVER` file,  with respect to reference :
 ```
 
 
+New
+===========
+
+```{r child='barheader_table.Rmd'}
+```
+
+### New 
+
+Origin of **new** sections in `r mLIBVER` file,  with respect to reference : `r params$LIBVER2`  
+
+```{r table_new} 
+  n<-comp%>%subset(LIB2=="NA") # new in LIB1 
+  data.table::setnames(n, old=c("LIB1","LIB2"), new=c(mLIBVER,params$LIBVER2))
+  datatable(n, filter='top', options = list(
+    pageLength=10,
+    rownames=FALSE,
+    autowidth=FALSE,
+    #scrollY="1000vh",
+    columnDefs=list(list(className='dt-center', targets=0:6))
+    ))
+  
+
+```
+
+
+
+
+
+
 Unchanged
 ===========
 
 ```{r child='barheader_table.Rmd'}
 ```
 
-### Unchanged  
+### **Unchanged**  
 
-Origin of **identical** sections in `r mLIBVER` file, with respect to reference : `r params$LIBVER2` 
+Origin of **unchanged** sections in `r mLIBVER` file, with respect to reference : `r params$LIBVER2` 
 
 ```{r table_same} 
   s<-comp%>%subset(LIB1==LIB2) # same occurrences 
@@ -151,4 +231,27 @@ Origin of **identical** sections in `r mLIBVER` file, with respect to reference 
 ```
 
 
-   
+Erased
+===========
+
+```{r child='barheader_table.Rmd'}
+```
+
+### **Erased** 
+
+Origin of **erased** sections in `r mLIBVER` file that were present in reference : `r params$LIBVER2` 
+
+```{r table_erased} 
+  e<-comp%>%subset(LIB1=="NA") #  
+  data.table::setnames(e, old=c("LIB1","LIB2"), new=c(mLIBVER,params$LIBVER2))
+  datatable(e, filter='top', options = list(
+    pageLength=10,
+    rownames=FALSE,
+    autowidth=FALSE,
+    #scrollY="1000vh",
+    columnDefs=list(list(className='dt-center', targets=0:6))
+    ))
+  
+
+```
+

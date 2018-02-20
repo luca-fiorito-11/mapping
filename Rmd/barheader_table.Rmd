@@ -11,37 +11,47 @@ flexdashboard::valueBox(mLIBVER, icon="fa-folder-open-o", href="https://www.oecd
 ### {data-width=160}
 
 ```{r } 
-flexdashboard::valueBox(mSYMAM, color="Gainsboro", caption = "Neutron File", icon="fa-file-o",
+flexdashboard::valueBox(mSYMAM, color="Gainsboro", caption = "Neutron File",  
                         href="#map"
                         )
 
 ```   
 
-### {data-width=160}
+### {data-width=128}
 
 ```{r } 
-flexdashboard::valueBox(tot, color="Gainsboro", caption = "Sections in file", icon="fa-clone")
+flexdashboard::valueBox(tot, color="Gainsboro", caption = "Sections in file")
 
 ```   
 
-### {data-width=160}
+### {data-width=128}
 
 ```{r } 
-flexdashboard::valueBox(totalupdated, color=UpdatedColor, caption = "Updated sections", icon="fa-chevron-up")
+flexdashboard::valueBox(totalupdated, color=UpdatedColor, caption = "Updated",
+                        icon="fa-chevron-up")
 
 ```   
 
-### {data-width=160}
+### {data-width=128}
 
 ```{r } 
-flexdashboard::valueBox(newinlib1, color=NewColor, caption = "New sections", icon="fa-chevron-up")
+flexdashboard::valueBox(newinlib1, color=NewColor, caption = "New", 
+                        icon="fa-chevron-up")
 
 ```   
 
-### {data-width=160}
+### {data-width=128}
 
 ```{r } 
-flexdashboard::valueBox(erasedfromlib2, color=ErasedColor, caption = "Erased sections", icon="fa-chevron-down")
+flexdashboard::valueBox(totunchanged, color="LightGray", caption = "Unchanged")
+
+```   
+
+### {data-width=128}
+
+```{r } 
+flexdashboard::valueBox(erasedfromlib2, color=ErasedColor, caption = "Erased", 
+                        icon="fa-chevron-down")
 
 ```   
 
