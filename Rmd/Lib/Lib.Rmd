@@ -1,0 +1,162 @@
+---
+title: "JEFF-3.3"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    theme : sandstone #readable #spacelab
+    logo: ../../www/logo.jpg
+    includes:
+      after_body: ../../html/footer.html
+    css: ../../www/styles.css
+params:
+  SYMAMLIBVER: "U-233-g-JEFF-3.3"
+  LIBVER: "JEFF-3.3"
+  LIBVER2: "JEFF-3.2" 
+  ver: "33"
+  
+---
+
+ 
+
+```{r setup}
+#knitr::opts_chunk$set(echo = FALSE, include= FALSE)
+
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+
+source("global.R")
+
+#define parameters to be used here : 
+myparams<-strsplit(params$SYMAMLIBVER, "-")[[1]]
+ 
+mX<-myparams[1]
+mA<-myparams[2]
+mM<-myparams[3]
+mLIB<-myparams[4]
+mVER<-myparams[5]
+mSYMAM<-paste(mX,"-", mA,"-",mM, sep ="")
+mLIBVER<-paste(mLIB,"-",mVER, sep = "")
+
+#for use by wrapper.R : 
+output_dir<-paste(mLIB,mVER, sep = "")
+output_file<-paste(mX,mA,mM)
+
+#for use by datatables :
+pdf<-df%>%subset(X==mX & A==mA & M==mM & LIBVER==mLIBVER)
+tot<-dim(pdf)[1]
+
+# preparing datatables
+pdfo<-df%>%subset(X==mX & A==mA & M==mM)
+lib2<-df%>%subset(LIBVER==params$LIBVER, 
+                    select = c('MFMT', 'MF', 'MFDES', 'MT', "MTDES", 'LIBVER', 'LIBVERORIG'))
+lib1<-pdfo%>%subset(LIBVER==mLIBVER,
+                    select = c('MFMT', 'MF', 'MFDES', 'MT', "MTDES", 'LIBVER', 'LIBVERORIG'))
+comp<-merge(lib1, lib2, by = c('MFMT', 'MF', 'MFDES', 'MT', "MTDES"), all=TRUE)
+data.table::setnames(comp, old=c("LIBVERORIG.x","LIBVERORIG.y"), new=c("LIB1","LIB2"))
+data.table::setnames(comp, old=c("MFDES","MTDES"), new=c("MF TYPE","MT TYPE"))
+comp<-subset(comp, select = c('MF TYPE', 'MT TYPE', 'MF', 'MT', 'LIB1', 'LIB2'))
+
+#counting : 
+# totalfiles<-dim(unique(df%>%subset(LIBVER==params$LIBVER, select=c("X","A","M"))))[1]
+
+totunchanged<-dim(comp%>%subset(LIB1==LIB2))[1]
+newinlib<-dim(comp%>%subset(is.na(LIB2)))[1] 
+
+comp[is.na(comp)] <- 'NA'
+
+UpdatedColor <-"Gray"
+NewColor <-"Gray"
+ErasedColor <-"Gray" 
+
+LIBLINK <-"https://www.oecd-nea.org/dbdata"
+
+lib<-unique(subset(df, LIBVER==mLIBVER, select=c("Z", "X", "A", "M", "SYMAM", "LIB")))
+totfiles<-dim(lib)[1]
+
+
+# for use by covariance counting :
+ 
+df_cov <-df %>%subset(LIBVER==params$LIBVER & MF %in%(30:40))
+
+nEval<-nrow(unique(subset(df_cov, select="MAT"))) 
+
+breakdown_cov <- df_cov %>% 
+  plyr::count('LIBVERORIG') %>% 
+  transform(percent = scales::percent(freq / sum(freq)))
+
+breakdown_cov <- breakdown_cov[rev(order(breakdown_cov$LIBVERORIG)),]
+
+```
+
+
+
+
+```{r child='barheader_libpage.Rmd'}
+```
+
+
+### **Access Files Individually**{data-width=600}
+
+
+```{r lib_table}
+
+icon1<-"<i class='fa fa-download'></i>"
+icon2<-"<i class='fa fa-sitemap'></i>"
+icon3<-"<i class='fa fa-file-alt'></i>"
+icon4<-"<i class='fa fa-file></i>"
+
+lib$ENDF6<-paste0(lib$Z,"-",lib$X, "-", lib$A, lib$M,".",tolower(lib$LIB),params$ver)
+lib$ENDF6<- paste0("<a href=endf6/'",lib$ENDF6,"' target='_blank'>",icon1,"</a>")
+
+lib$ACE<-paste0(lib$Z,"-",lib$X, "-", lib$A,lib$M,".",tolower(lib$LIB),params$ver,"-ACE")
+lib$ACE<- paste0("<a href=ace/'",lib$ACE,"' target='_blank'>",icon1,"</a>")
+
+lib$MAP<-paste0(lib$X, "-", lib$A,"-", lib$M,".html")
+lib$MAP <- paste0("<a href=map/'",lib$MAP,"' target='_blank'>",icon2,"</a>")
+
+
+lib<-subset(lib, select=c("Z", "SYMAM", "ENDF6", "ACE", "MAP"))
+
+#convert all data to factors : 
+lib[] <- lapply(lib, factor)
+
+datatable(lib, #filter='top', 
+          #extensions = 'Buttons', 
+          rownames=FALSE, escape=FALSE, 
+          options = list(
+            #dom = 'Bfrtip', 
+            #buttons = list('copy', 'print', list(
+            #  extend = 'collection', buttons = c('csv', 'excel', 'pdf'),
+            #  text = 'Download')),
+            pageLength=10,
+            autowidth=TRUE, 
+            order = list(0, 'asc'),
+            columnDefs=list(
+              list(width='10%', targets = 0),
+              list(className='dt-center', targets = 0:4)
+            ))
+    )
+```
+  
+  
+### **Type and Origin of data sections**{data-width=400}
+
+```{r plot_histo}
+
+g <- ggplot(df%>%subset(LIBVER==LIBVER), aes(MF)) +
+  geom_bar(aes(fill=LIBVERORIG), width = 0.5) +
+  coord_flip()+
+  scale_fill_manual(values=my_colors)+
+  theme_light() +
+  theme(legend.title=element_blank(),
+        plot.background=element_rect(fill="white"),
+        plot.margin = unit(c(0.7, 0, 2, 1), "cm"))
+
+ggplotly(g)
+
+```
+   
+ 
+
+
+   

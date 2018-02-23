@@ -45,7 +45,7 @@ Row {data-height=200}
 
 ### evaluations with MF`r selected_MF` in `r params$RELEASE` {data-width=150}
 ```{r}
-nEval <- df_cov %>% select("MAT") %>% unique() %>% nrow()
+nEval <- df_cov %>% dplyr::select("MAT") %>% unique() %>% nrow()
 nEvalTot <- df %>% subset(LIBVER==params$RELEASE) %>% select("MAT") %>% unique() %>% nrow()
 gauge(nEval, min = 0, max = nEvalTot, gaugeSectors(
   success = c(0, 2), warning = c(3, 6), danger = c(7, 10)

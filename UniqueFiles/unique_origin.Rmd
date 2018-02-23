@@ -117,7 +117,7 @@ The isotopes in <span style="backgroundcolor:green;">green</span> correspond to 
 
 ### evaluations found {data-width=250}
 ```{r}
-valueBox(nrow(UNIQUES), icon = "fa-file")
+#valueBox(nrow(UNIQUES), icon = "fa-file")
 ```
 
 
