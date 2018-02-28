@@ -106,13 +106,13 @@ icon3<-"<i class='fa fa-file-alt'></i>"
 icon4<-"<i class='fa fa-file></i>"
 
 lib$ENDF6<-paste0(lib$Z,"-",lib$X, "-", lib$A, lib$M,".",tolower(lib$LIB),params$ver)
-lib$ENDF6<- paste0("<a href=endf6/'",lib$ENDF6,"' target='_blank'>",icon1,"</a>")
+lib$ENDF6<- paste0("<a href='endf6/",lib$ENDF6,"' target='_blank'>",icon1,"</a>")
 
 lib$ACE<-paste0(lib$Z,"-",lib$X, "-", lib$A,lib$M,".",tolower(lib$LIB),params$ver,"-ACE")
-lib$ACE<- paste0("<a href=ace/'",lib$ACE,"' target='_blank'>",icon1,"</a>")
+lib$ACE<- paste0("<a href='ace/",lib$ACE,"' target='_blank'>",icon1,"</a>")
 
 lib$MAP<-paste0(lib$X, "-", lib$A,"-", lib$M,".html")
-lib$MAP <- paste0("<a href=map/'",lib$MAP,"' target='_blank'>",icon2,"</a>")
+lib$MAP <- paste0("<a href='map/",lib$MAP," ' target='_blank'>",icon2,"</a>")
 
 
 lib<-subset(lib, select=c("Z", "SYMAM", "ENDF6", "ACE", "MAP"))
