@@ -7,8 +7,8 @@ output:
     theme : sandstone #readable #spacelab
     logo: ../../www/logo.jpg
     includes:
-      before_body: ../../html/myNEAheader.html
-      after_body: ../../html/myNEAfooter.html
+      #before_body: ../../html/myNEAheader.html
+      #after_body: ../../html/myfooter.html
     css: ../../www/styles.css
 params:
   SYMAMLIBVER: "U-233-g-JEFF-3.3"

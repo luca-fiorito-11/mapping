@@ -57,11 +57,6 @@ MT,MTDES
 301,total heat production
 443,kinematic KERMA
 444,damage-energy production
-451,descriptive data of the evaluated file
-452,number of neutrons per fission nu-bar
-455,delayed neutron data nu-bar-d
-456,number of prompt neutrons per fission nu-bar-p
-458,components of energy release due to fission
 600,"(n,p) to ground state"
 649,"(n,p) to continuum"
 650,"(n,d) to ground state"

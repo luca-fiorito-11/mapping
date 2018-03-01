@@ -33,7 +33,7 @@ font-size: 11px;
 knitr::opts_chunk$set(echo = FALSE)
 
 
-source("global.R")
+source("../../global.R")
 
 #define parameters to be used here : 
 myparams<-strsplit(params$SYMAMLIBVER, "-")[[1]]
