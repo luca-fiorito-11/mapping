@@ -24,26 +24,28 @@ library(flexdashboard)
 # set environment variable to pass proxy
 #Sys.setenv(HTTPS_PROXY="http://proxy-vip1.oecd-nea.org:3128")
 
+gpath<-"https://raw.githubusercontent.com/luca-fiorito-11/mapping/r-app/csv/"
+
 # dataframe coming from the mapping run
-df <- fread('csv/testdata.csv',
+df <- fread(paste0(gpath,'CHUNKS-JEFF.csv'),
             header = TRUE,
             sep = ",",
             stringsAsFactors = FALSE)
 
 # dataframe containing 562 (JEFF.33 correspondences between MAT and Z,A,M)
-mats <- fread('csv/matzsymam.csv',
+mats <- fread(paste0(gpath,'matzsymam.csv'),
               header = TRUE,
               sep = ",",
               stringsAsFactors = FALSE)
 
 # dataframe containing descriptions for each MF
-mts<-fread('csv/MTs.csv',
+mts<-fread(paste0(gpath,'MTs.csv'),
            header = TRUE,
            sep = ",",
            stringsAsFactors = TRUE)
 
 # dataframe containing descriptions for each MT
-mfs<-fread('csv/MF.csv',
+mfs<-fread(paste0(gpath,'MF.csv'),
            header = TRUE,
            sep = ",",
            stringsAsFactors = TRUE)
@@ -70,10 +72,10 @@ df$MF <- factor(df$MF)
 df$MT <- factor(df$MT)
 
 # dataframe containing colors associated to eahc lib version
-colors <- fread("csv/my_colors.csv")
+colors <- fread(paste0(gpath,'my_colors.csv'))
 #needs to be a named vector :
 my_colors<- setNames(as.character(colors$LIBVERCOLOR), as.character(colors$LIBVER))
 
-libdates <- fread('csv/libdate.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)
+libdates <- fread(paste0(gpath,'libdate.csv'), header = TRUE, sep = ",", stringsAsFactors = TRUE)
 libdates$LIBVER<-paste(libdates$LIB,libdates$VER, sep="-")
 libdates<- setNames(as.character(libdates$YY), as.character(libdates$LIBVER))
