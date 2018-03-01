@@ -7,7 +7,7 @@
 
 mylib<-"JEFF-3.3" 
 
-df2<-df%>%subset(LIBVER==mylib & X=="U")
+df2<-df%>%subset(LIBVER==mylib & X=="P")
 df2$SYMAMLIBVER<-paste(df2$SYMAM,"-",df2$LIB,"-",df2$VER, sep="")
 
 # Define report tibble with output filenames and parameters

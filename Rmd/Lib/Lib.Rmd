@@ -7,7 +7,8 @@ output:
     theme : sandstone #readable #spacelab
     logo: ../../www/logo.jpg
     includes:
-      after_body: ../../html/footer.html
+      before_body: ../../html/myNEAheader.html
+      after_body: ../../html/myNEAfooter.html
     css: ../../www/styles.css
 params:
   SYMAMLIBVER: "U-233-g-JEFF-3.3"
@@ -24,7 +25,7 @@ params:
 
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 
-source("global.R")
+source("../../global.R")
 
 #define parameters to be used here : 
 myparams<-strsplit(params$SYMAMLIBVER, "-")[[1]]
@@ -100,42 +101,46 @@ breakdown_cov <- breakdown_cov[rev(order(breakdown_cov$LIBVERORIG)),]
 
 ```{r lib_table}
 
-icon1<-"<i class='fa fa-download'></i>"
-icon2<-"<i class='fa fa-sitemap'></i>"
-icon3<-"<i class='fa fa-file-alt'></i>"
-icon4<-"<i class='fa fa-file></i>"
 
-lib$ENDF6<-paste0(lib$Z,"-",lib$X, "-", lib$A, lib$M,".",tolower(lib$LIB),params$ver)
-lib$ENDF6<- paste0("<a href='endf6/",lib$ENDF6,"' target='_blank'>",icon1,"</a>")
-
-lib$ACE<-paste0(lib$Z,"-",lib$X, "-", lib$A,lib$M,".",tolower(lib$LIB),params$ver,"-ACE")
-lib$ACE<- paste0("<a href='ace/",lib$ACE,"' target='_blank'>",icon1,"</a>")
-
-lib$MAP<-paste0(lib$X, "-", lib$A,"-", lib$M,".html")
-lib$MAP <- paste0("<a href='map/",lib$MAP," ' target='_blank'>",icon2,"</a>")
+htmltools::includeHTML("ndec.html")
 
 
-lib<-subset(lib, select=c("Z", "SYMAM", "ENDF6", "ACE", "MAP"))
-
-#convert all data to factors : 
-lib[] <- lapply(lib, factor)
-
-datatable(lib, #filter='top', 
-          #extensions = 'Buttons', 
-          rownames=FALSE, escape=FALSE, 
-          options = list(
-            #dom = 'Bfrtip', 
-            #buttons = list('copy', 'print', list(
-            #  extend = 'collection', buttons = c('csv', 'excel', 'pdf'),
-            #  text = 'Download')),
-            pageLength=10,
-            autowidth=TRUE, 
-            order = list(0, 'asc'),
-            columnDefs=list(
-              list(width='10%', targets = 0),
-              list(className='dt-center', targets = 0:4)
-            ))
-    )
+# icon1<-"<i class='fa fa-download'></i>"
+# icon2<-"<i class='fa fa-sitemap'></i>"
+# icon3<-"<i class='fa fa-file-alt'></i>"
+# icon4<-"<i class='fa fa-file></i>"
+# 
+# lib$ENDF6<-paste0(lib$Z,"-",lib$X, "-", lib$A, lib$M,".",tolower(lib$LIB),params$ver)
+# lib$ENDF6<- paste0("<a href='endf6/",lib$ENDF6,"' target='_blank'>",icon1,"</a>")
+# 
+# lib$ACE<-paste0(lib$Z,"-",lib$X, "-", lib$A,lib$M,".",tolower(lib$LIB),params$ver,"-ACE")
+# lib$ACE<- paste0("<a href='ace/",lib$ACE,"' target='_blank'>",icon1,"</a>")
+# 
+# lib$MAP<-paste0(lib$X, "-", lib$A,"-", lib$M,".html")
+# lib$MAP <- paste0("<a href='map/",lib$MAP," ' target='_blank'>",icon2,"</a>")
+# 
+# 
+# lib<-subset(lib, select=c("Z", "SYMAM", "ENDF6", "ACE", "MAP"))
+# 
+# #convert all data to factors : 
+# lib[] <- lapply(lib, factor)
+# 
+# datatable(lib, #filter='top', 
+#           #extensions = 'Buttons', 
+#           rownames=FALSE, escape=FALSE, 
+#           options = list(
+#             #dom = 'Bfrtip', 
+#             #buttons = list('copy', 'print', list(
+#             #  extend = 'collection', buttons = c('csv', 'excel', 'pdf'),
+#             #  text = 'Download')),
+#             pageLength=10,
+#             autowidth=TRUE, 
+#             order = list(0, 'asc'),
+#             columnDefs=list(
+#               list(width='10%', targets = 0),
+#               list(className='dt-center', targets = 0:4)
+#             ))
+#     )
 ```
   
   
@@ -156,7 +161,47 @@ ggplotly(g)
 
 ```
    
- 
+Row
+------
 
+
+### **Evaluated Files That are different from previous release**{data-width=600}
+
+
+```{r table_diffs}
+
+lib2 <-data.table::fread('../../csv/JEFF33_vs_JEFF32.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE) %>% # RELATIVE PATH
+  subset(MT!=451) %>%  # REMOVE MF1MT451
+  dplyr::group_by(MAT) %>% 
+  dplyr::summarize(NEW=all(VERORIG==3.3)) %>%
+  subset(NEW==TRUE) %>% # SET TO FALSE TO HAVE MATS THAT HAVE NOT CHANGED
+  merge(fread('../../csv/matzsymam.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)) # MERGE TO HAVE MASS, CHARGE, ETC
+
+datatable(lib2, #filter='top', 
+          #extensions = 'Buttons', 
+          rownames=FALSE, escape=FALSE, 
+          options = list(
+            #dom = 'Bfrtip', 
+            #buttons = list('copy', 'print', list(
+            #  extend = 'collection', buttons = c('csv', 'excel', 'pdf'),
+            #  text = 'Download')),
+            pageLength=10,
+            autowidth=TRUE, 
+            order = list(0, 'asc'),
+            columnDefs=list(
+              list(width='10%', targets = 0),
+              list(className='dt-center', targets = 0:4)
+            ))
+    )
+```
+  
+
+
+<!-- df <-data.table::fread('csv/JEFF33_vs_JEFF32.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE) %>% # RELATIVE PATH -->
+<!--   subset(MT!=451) %>%  # REMOVE MF1MT451 -->
+<!--   dplyr::group_by(MAT) %>%  -->
+<!--   dplyr::summarize(NEW=all(VERORIG==3.3)) %>% -->
+<!--   subset(NEW==TRUE) %>% # SET TO FALSE TO HAVE MATS THAT HAVE NOT CHANGED -->
+<!--   merge(fread('csv/matzsymam.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)) # MERGE TO HAVE MASS, CHARGE, ETC -->
 
    

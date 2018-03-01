@@ -5,9 +5,9 @@ output:
     orientation: rows
     vertical_layout: scroll
     theme : sandstone #readable #spacelab
-    logo: www/logo.jpg
+    logo: ../../www/logo.jpg
     includes:
-      after_body: html/footer.html
+      after_body: ../../html/footer.html
     #css: mystyles.css
 params:
   SYMAMLIBVER: "U-233-g-JEFF-3.3"

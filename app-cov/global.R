@@ -26,9 +26,9 @@ library(splitstackshape)
 Sys.setenv(HTTPS_PROXY="http://proxy-vip1.oecd-nea.org:3128")
 
 
-df <- fread('../Rapp/csv/CHUNKS-JEFF.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)  
+df <- fread('../csv/CHUNKS-JEFF.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)  
 # mats contains 562 (JEFF.33 correspondences between MAT and Z,A,M)
-mats <- fread('../Rapp/csv/matzsymam.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)  
+mats <- fread('../csv/matzsymam.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)  
 df <- merge(df, mats)
 df$MFMT <- paste(df$MF*1000+df$MT)
 df <- df[order(df$MFMT),]
@@ -67,7 +67,7 @@ my_colors <- c(
 
 
 # dataframe that asspciates releases to dates
-libdates <- fread('../Rapp/csv/libdate.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)
+libdates <- fread('../csv/libdate.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)
 libdates$LIBVER <- paste(libdates$LIB, libdates$VER, sep='-')
 libdates <- transform(libdates, DATE = as.Date(as.character(YY), "%Y"))
 # count_df = df[LIB=="JEFF" & MAT==9225 , .(count=.N) , by="LIBVER,LIBVERORIG"]
