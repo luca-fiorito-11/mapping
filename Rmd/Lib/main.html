@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.10.12/css/jquery.dataTables.min.css" type="text/css"> 
+  <link type="text/css" rel="stylesheet" href="./view/ndec-web/views.css"> 
+</head>
+<body>
+   
+  <!-- <img src="fms/images/nealogo.jpg" height="100"/> -->
+ 
+<!--   <p>	
+  <a href="../index.html" class="button">Home</a>&nbsp;|&nbsp;
+  <a href="../workqueue.html" class="button">Work Queue</a>&nbsp;|&nbsp;
+  <a href="../scripts.html" class="button">Scripts</a>&nbsp;|&nbsp;
+  <a href="./lib.html" class="button"><b>Views</b></a>&nbsp;|&nbsp;
+  <a href="../logout.html" class="button">Logout</a>
+  </p>
+
+  <p>	
+  <a href="./lib.html" class="button"><b>Files</b>&nbsp;|&nbsp;
+  <a href="./scripts.ftl" class="button">Scripts</a>
+  </p> -->
+  
+  <!-- <hr/> -->
+  
+  <!-- <h1>Files</h1> -->
+
+    
+  <table id="ndec-jeff33">
+    <thead>
+      <tr>
+        <th>Z</th>
+        <th>A</th>
+        <th>State</th>
+        <th>File</th>
+          <th>psyche</th>
+          <th>checkr</th>
+          <th>njoy</th>
+          <th>fizcon</th>
+          <th>inter</th>
+          <th>endf2c</th>
+          <th>relable</th>
+          <th>prepro</th>
+        <th>ENDF-6</th>
+        <th>ACE</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>2</td>
+        <td>3</td>
+        <td>0</td>
+        <td>7071.endf</td>
+    <td class="c ndec-ok">
+      <a href="./view/ndec-web/seed_downloads179384.html">
+      0 msg
+      </a>
+    </td>
+    <td class="c ndec-ok">
+      <a href="./view/ndec-web/seed_downloads179384.html">
+      0 msg
+      </a>
+    </td>
+    <td class="c ndec-warning">
+      <a href="./view/ndec-web/seed_downloads179384.html">
+      3 warn
+      </a>
+    </td>
+    <td class="c ndec-error">
+      <a href="./view/ndec-web/seed_downloads179384.html">
+      1 err
+      </a>
+    </td>
+    <td class="c ndec-ok">
+      <a href="./view/ndec-web/seed_downloads179384.html">
+      0 msg
+      </a>
+    </td>
+    <td class="c ndec-ok">
+      <a href="./view/ndec-web/seed_downloads179384.html">
+      0 msg
+      </a>
+    </td>
+    <td class="c ndec-ok">
+      <a href="./view/ndec-web/seed_downloads179384.html">
+      0 msg
+      </a>
+    </td>
+    <td class="c ndec-ok">
+      <a href="./view/ndec-web/seed_downloads179384.html">
+      0 msg
+      </a>
+    </td>
+        <td class="c"><a href="files/179389.endf"><i class="fa fa-download" style="font-size:24px"></i></a></td>
+        <td class="c"><a href="files/179408.ace"><i class="fa fa-download" style="font-size:24px"></i></a>
+      </tr>
+      <tr>
+        <td>44</td>
+        <td>98</td>
+        <td>0</td>
+        <td>ru98.hendf</td>
+    <td class="c ndec-ok">
+      <a href="./view/ndec-web/seed_downloads179339.html">
+      0 msg
+      </a>
+    </td>
+    <td class="c ndec-error">
+      <a href="./view/ndec-web/seed_downloads179339.html">
+      5 warn / 25 err
+      </a>
+    </td>
+    <td class="c ndec-error">
+      <a href="./view/ndec-web/seed_downloads179339.html">
+      2 warn / 1 err
+      </a>
+    </td>
+    <td class="c ndec-error">
+      <a href="./view/ndec-web/seed_downloads179339.html">
+      8 err
+      </a>
+    </td>
+    <td class="c ndec-ok">
+      <a href="./view/ndec-web/seed_downloads179339.html">
+      0 msg
+      </a>
+    </td>
+    <td class="c ndec-ok">
+      <a href="./view/ndec-web/seed_downloads179339.html">
+      0 msg
+      </a>
+    </td>
+    <td class="c ndec-ok">
+      <a href="./view/ndec-web/seed_downloads179339.html">
+      0 msg
+      </a>
+    </td>
+    <td class="c ndec-ok">
+      <a href="./view/ndec-web/seed_downloads179339.html">
+      0 msg
+      </a>
+    </td>
+        <td class="c"><a href="files/179366.endf"><i class="fa fa-download" style="font-size:24px"></i></a></td>
+        <td class="c">(missing)
+      </tr>
+    </tbody>
+  </table>
+
+<script type="text/javascript" src="jquery-1.12.3.js"></script>
+<script type="text/javascript" src="jquery.dataTables.min.js"></script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.25.1/js/jquery.tablesorter.js'></script>
+
+  
+  <script>
+  $(function(){
+    $("#ndec-jeff33").dataTable({
+    "ordering":true,
+    "lengthMenu": [ [50, 100, 250, -1], [50, 100, 250, "All"] ],
+    "pageLength": 570
+    });
+  })
+  </script>  
+
+  
+</body>
+</html>

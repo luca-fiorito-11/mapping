@@ -14,21 +14,22 @@ flexdashboard::valueBox(totfiles, color="yellow", caption = "Neutron Files")
 
 ```   
 
-### Evaluations with Covariance Data in `r params$LIBVER` {data-width=200}
-```{r}
-gauge(nEval, min = 0, max = totfiles, gaugeSectors(
-  success = c(0, 2), warning = c(3, 6), danger = c(7, 10)
-))
-```
+###{data-width=600}
+<!-- ### Evaluations with Covariance Data in `r params$LIBVER` {data-width=200} -->
+<!-- ```{r} -->
+<!-- gauge(nEval, min = 0, max = totfiles, gaugeSectors( -->
+<!--   success = c(0, 2), warning = c(3, 6), danger = c(7, 10) -->
+<!-- )) -->
+<!-- ``` -->
 
 
-###  Type of Covariance Data {data-width=400}
+<!-- ###  Type of Covariance Data {data-width=400} -->
 
-```{r}
+<!-- ```{r} -->
 
-plot_ly(df_cov, x=~MF)
- 
-```
+<!-- plot_ly(df_cov, x=~MF) -->
+
+<!-- ``` -->
 
 
 Row {}
