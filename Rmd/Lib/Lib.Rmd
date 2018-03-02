@@ -1,5 +1,5 @@
 ---
-title: "JEFF-3.3"
+title: ""
 output: 
   flexdashboard::flex_dashboard:
     orientation: rows
@@ -71,8 +71,24 @@ ErasedColor <-"Gray"
 
 LIBLINK <-"https://www.oecd-nea.org/dbdata"
 
-lib<-unique(subset(df, LIBVER==mLIBVER, select=c("Z", "X", "A", "M", "SYMAM", "LIB")))
+lib<-unique(subset(df, LIBVER==mLIBVER, select=c("Z", "X", "A", "M", "SYMAM", "MAT", "LIB")))
 totfiles<-dim(lib)[1]
+
+# building columns in lib as html links : 
+
+icon1<-"<i class='fa fa-download'></i>"
+icon2<-"<i class='fa fa-sitemap'></i>"
+icon3<-"<i class='fa fa-file-alt'></i>"
+icon4<-"<i class='fa fa-file></i>"
+
+lib$ENDF6<-paste0(lib$Z,"-",lib$X, "-", lib$A, lib$M,".",tolower(lib$LIB),params$ver)
+lib$ENDF6<- paste0("<a href='endf6/",lib$ENDF6,"' target='_blank'>",icon1,"</a>")
+
+lib$ACE<-paste0(lib$Z,"-",lib$X, "-", lib$A,lib$M,".",tolower(lib$LIB),params$ver,"-ACE")
+lib$ACE<- paste0("<a href='ace/",lib$ACE,"' target='_blank'>",icon1,"</a>")
+
+lib$MAP<-paste0(lib$X, "-", lib$A,"-", lib$M,".html")
+lib$MAP <- paste0("<a href='map/",lib$MAP," ' target='_blank'>",icon2,"</a>")
 
 
 # for use by covariance counting :
@@ -90,94 +106,82 @@ breakdown_cov <- breakdown_cov[rev(order(breakdown_cov$LIBVERORIG)),]
 ```
 
 
-
+NDEC
+====
 
 ```{r child='barheader_libpage.Rmd'}
 ```
 
+### **Access Files Individually**{data-width=500}
 
-### **Access Files Individually**{data-width=600}
-
-
-```{r lib_table}
-
-
-htmltools::includeHTML("ndec.html")
-
-
-# icon1<-"<i class='fa fa-download'></i>"
-# icon2<-"<i class='fa fa-sitemap'></i>"
-# icon3<-"<i class='fa fa-file-alt'></i>"
-# icon4<-"<i class='fa fa-file></i>"
-# 
-# lib$ENDF6<-paste0(lib$Z,"-",lib$X, "-", lib$A, lib$M,".",tolower(lib$LIB),params$ver)
-# lib$ENDF6<- paste0("<a href='endf6/",lib$ENDF6,"' target='_blank'>",icon1,"</a>")
-# 
-# lib$ACE<-paste0(lib$Z,"-",lib$X, "-", lib$A,lib$M,".",tolower(lib$LIB),params$ver,"-ACE")
-# lib$ACE<- paste0("<a href='ace/",lib$ACE,"' target='_blank'>",icon1,"</a>")
-# 
-# lib$MAP<-paste0(lib$X, "-", lib$A,"-", lib$M,".html")
-# lib$MAP <- paste0("<a href='map/",lib$MAP," ' target='_blank'>",icon2,"</a>")
-# 
-# 
-# lib<-subset(lib, select=c("Z", "SYMAM", "ENDF6", "ACE", "MAP"))
-# 
-# #convert all data to factors : 
-# lib[] <- lapply(lib, factor)
-# 
-# datatable(lib, #filter='top', 
-#           #extensions = 'Buttons', 
-#           rownames=FALSE, escape=FALSE, 
-#           options = list(
-#             #dom = 'Bfrtip', 
-#             #buttons = list('copy', 'print', list(
-#             #  extend = 'collection', buttons = c('csv', 'excel', 'pdf'),
-#             #  text = 'Download')),
-#             pageLength=10,
-#             autowidth=TRUE, 
-#             order = list(0, 'asc'),
-#             columnDefs=list(
-#               list(width='10%', targets = 0),
-#               list(className='dt-center', targets = 0:4)
-#             ))
-#     )
+```{r ndec_table}
+htmltools::includeHTML("main.html")
 ```
+
+<!-- ### **Map to files**{data-width=200} -->
+
+
+<!-- ```{r lib_table} -->
+
+<!-- lib<-subset(lib, select=c("Z", "SYMAM", "MAT", "MAP")) -->
+<!-- libo<-lib -->
+<!-- #convert all data to factors : -->
+<!-- lib[] <- lapply(lib, factor) -->
+
+<!-- datatable(lib, #filter='top', -->
+<!--           rownames=FALSE, escape=FALSE, -->
+<!--           options = list(  -->
+<!--             pageLength=10, -->
+<!--             autowidth=TRUE, -->
+<!--             order = list(0, 'asc'), -->
+<!--             columnDefs=list( -->
+<!--               list(width='10%', targets = 0), -->
+<!--               list(className='dt-center', targets = 0:2) -->
+<!--             )) -->
+<!--     ) -->
+<!-- ``` -->
+
   
-  
-### **Type and Origin of data sections**{data-width=400}
+<!-- ### **Type and Origin of data sections**{data-width=400} -->
 
-```{r plot_histo}
+<!-- ```{r plot_histo} -->
 
-g <- ggplot(df%>%subset(LIBVER==LIBVER), aes(MF)) +
-  geom_bar(aes(fill=LIBVERORIG), width = 0.5) +
-  coord_flip()+
-  scale_fill_manual(values=my_colors)+
-  theme_light() +
-  theme(legend.title=element_blank(),
-        plot.background=element_rect(fill="white"),
-        plot.margin = unit(c(0.7, 0, 2, 1), "cm"))
+<!-- g <- ggplot(df%>%subset(LIBVER==LIBVER), aes(MF)) + -->
+<!--   geom_bar(aes(fill=LIBVERORIG), width = 0.5) + -->
+<!--   coord_flip()+ -->
+<!--   scale_fill_manual(values=my_colors)+ -->
+<!--   theme_light() + -->
+<!--   theme(legend.title=element_blank(), -->
+<!--         plot.background=element_rect(fill="white"), -->
+<!--         plot.margin = unit(c(0.7, 0, 2, 1), "cm")) -->
 
-ggplotly(g)
+<!-- ggplotly(g) -->
 
-```
-   
+<!-- ``` -->
+
 Row
 ------
 
 
-### **Evaluated Files That are different from previous release**{data-width=600}
+### **List of modified files since previous release `r params$LIBVER2` **{data-width=600}
 
 
 ```{r table_diffs}
 
-lib2 <-data.table::fread('../../csv/JEFF33_vs_JEFF32.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE) %>% # RELATIVE PATH
+lib2 <-data.table::fread(paste0(gpath,'JEFF33_vs_JEFF32.csv'), header = TRUE, sep = ",", stringsAsFactors = TRUE) %>% # RELATIVE PATH
   subset(MT!=451) %>%  # REMOVE MF1MT451
   dplyr::group_by(MAT) %>% 
   dplyr::summarize(NEW=all(VERORIG==3.3)) %>%
   subset(NEW==TRUE) %>% # SET TO FALSE TO HAVE MATS THAT HAVE NOT CHANGED
-  merge(fread('../../csv/matzsymam.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)) # MERGE TO HAVE MASS, CHARGE, ETC
+  merge(mats) # MERGE TO HAVE MASS, CHARGE, ETC
 
-datatable(lib2, #filter='top', 
+lib2$SYMAM<-paste0(lib2$X,"-",lib2$A,"-",lib2$M)
+
+lib2<-subset(lib2, select=c('Z', 'SYMAM', 'NEW'))
+
+lib3<-merge(x=lib, y=lib2, all.x=TRUE) #, by="SYMAM")
+
+datatable(lib3, #filter='top', 
           #extensions = 'Buttons', 
           rownames=FALSE, escape=FALSE, 
           options = list(
@@ -204,4 +208,8 @@ datatable(lib2, #filter='top',
 <!--   subset(NEW==TRUE) %>% # SET TO FALSE TO HAVE MATS THAT HAVE NOT CHANGED -->
 <!--   merge(fread('csv/matzsymam.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)) # MERGE TO HAVE MASS, CHARGE, ETC -->
 
+Covariances
+====
    
+Other MF/MT Content
+====

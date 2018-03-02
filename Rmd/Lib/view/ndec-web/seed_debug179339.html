@@ -1,0 +1,83 @@
+<!--#include virtual="/layout/top.php?panel=all&title=JEFF Nuclear Data Library - NEA" -->
+ 
+<!-- LEFT PANEL START -->
+<div id="left-panel">
+ <!--#include virtual="mytemplates/ndata-left-col.html" -->
+</div>
+<!-- LEFT PANEL STOP -->
+
+
+<link rel="stylesheet" href="views.css" type="text/css">
+
+<!-- bodytext START -->
+<div id="bodytext">
+
+  <div class="topnav">
+    <a href="./seed_downloads179339.html">Derived Files</a>
+    <a href="./seed_plots179339.html">Plots</a>
+    <a href="./seed_we179339.html">Warnings &amp Errors</a>
+    <a href="#debug">Debug</a>
+  </div>
+
+  <div class="main">
+
+    <h1>NDEC</h1>
+
+    <p>
+    <a href="./../index.html">Files</a> &gt; <b><a href="./seed_downloads179339.html">ru98.hendf</a></b>
+    </p>
+  
+    <p><em>
+    Z=44 A=98 state=0<br/>
+    Uploaded on Feb 21, 2018 7:05:35 PM<br/>
+    Processing : TERMINATED_OK
+    </em></p>
+  
+    <h1>DEBUG</h1>
+    
+    <p>Scripts I/O:</p>
+    <ul>
+    <li>ScriptIO[inter_output,TEXT]</li>
+    <li>ScriptIO[checkr_output,TEXT]</li>
+    <li>ScriptIO[njoy-stdout,TEXT]</li>
+    <li>ScriptIO[njoy_output,TEXT]</li>
+    <li>ScriptIO[inter-stdout,TEXT]</li>
+    <li>ScriptIO[fizcon_output,TEXT]</li>
+    <li>ScriptIO[linear_output,TEXT]</li>
+    <li>ScriptIO[fizcon-stdout,TEXT]</li>
+    <li>ScriptIO[legend_output,TEXT]</li>
+    <li>ScriptIO[psyche_output,TEXT]</li>
+    <li>ScriptIO[checkr-stdout,TEXT]</li>
+    <li>ScriptIO[endf2c-stdout,TEXT]</li>
+    <li>ScriptIO[std,ENDF]</li>
+    <li>ScriptIO[recent_output,TEXT]</li>
+    <li>ScriptIO[sigma1_output,TEXT]</li>
+    <li>ScriptIO[activate_output,TEXT]</li>
+    <li>ScriptIO[prepro-stdout,TEXT]</li>
+    <li>ScriptIO[relable-stderr,TEXT]</li>
+    <li>ScriptIO[prepro_pendf,ENDF]</li>
+    <li>ScriptIO[psyche-stdout,TEXT]</li>
+    <li>ScriptIO[endf2c_output,TEXT]</li>
+    <li>ScriptIO[relab,ENDF]</li>
+    </ul>
+  
+    FreeMarker ndecNbMessages method:
+    <ul>
+    <li>ndecNbMessages("", "", "") = 41</li>
+    <li>ndecNbMessages("ERROR", "", "") = 34</li>
+    <li>ndecNbMessages("WARNING", "", "") = 7</li>
+    <li>ndecNbMessages("ERROR,WARNING", "", "") = 41</li>
+    <li>ndecNbMessages("", "prepro", "") = 0</li>
+    </ul>
+
+  </div>
+  
+</div> 
+<!-- bodytext STOP --> 
+ 
+<!-- RIGHT PANEL START -->
+<div id="right-panel">
+	<!--#include virtual="/dbdata/jeff/mytemplates/ndata-jeff-right-col.html" -->
+</div>
+<!-- RIGHT PANEL STOP -->
+<!--#include virtual="/layout/bottom.php?panels=1" -->
