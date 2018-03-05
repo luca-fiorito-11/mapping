@@ -215,8 +215,6 @@ PARALLEL="parallel --no-run-if-empty -j ${NJOBS-20} --linebuffer ${DRYRUN}"
 #                                                                     #
 #######################################################################
 #######################################################################
-[[ -z $XML ]] || printf "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" > "$XML"
-[[ -z $XML ]] || printf "<evals>\n" >> "$XML"
-[[ -z $NOHEADER ]] && printf "%s,%s,%s,%s,%s,%s,%s\n" "LIB" "VER" "MAT" "MF" "MT" "OLIB" "OVER" 
+[[ -z $NOHEADER ]] && printf "%s,%s,%s,%s,%s,%s,%s\n" "LIB" "VER" "MAT" "MF" "MT" "LIBORIG" "VERORIG" 
 export -f mapping_foo
 $PARALLEL --colsep '[" "\t]+' mapping_foo {1} {2} {3} :::: "$CHUNKLIST"
