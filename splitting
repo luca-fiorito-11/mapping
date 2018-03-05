@@ -100,7 +100,8 @@ NAME="$( basename $FILE)"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 TWD="${TWD:-$(pwd)}"
 TWD="$(realpath $TWD)"
-[[ -d "$TWD" ]] ||  { >&2 echo -e "ERROR: no existing directory called '$TWD'"; exit 1; }
+mkdir -p "$TWD"
+#[[ -d "$TWD" ]] ||  { >&2 echo -e "ERROR: no existing directory called '$TWD'"; exit 1; }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Set target working directory
 # Standardization and csplit is done in temporary folder
