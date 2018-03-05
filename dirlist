@@ -1,0 +1,32 @@
+# directory					library	version	date (date, source)
+/opt/lab/data/libs/CENDL-2/neutron/chunks	CENDL	2	1991	IAEA
+/opt/lab/data/libs/JEFF-22/neutron/chunks	JEFF	2.2	199201  NEA
+/opt/lab/data/libs/BROND-22/neutron/chunks	BROND	2.2	1992	IAEA
+/opt/lab/data/libs/JENDL-32/neutron/chunks	JENDL	3.2	1994	IAEA / released in 1989 and modified in 1990 and 1994 (NEA)
+/opt/lab/data/libs/JEFF-30/neutron/chunks	JEFF	3.0	200204	NEA
+/opt/lab/data/libs/ENDFB-68/neutron/chunks	ENDFB	6.8	2002	NEA
+/opt/lab/data/libs/JENDL-33/neutron/chunks	JENDL	3.3	2002	NEA
+/opt/lab/data/libs/ENDFB-70/neutron/chunks	ENDFB	7.0	200612	NEA
+/opt/lab/data/libs/ROSFOND/neutron/chunks	ROSFOND ""	2008	IAEA
+/opt/lab/data/libs/TENDL-2008/neutron/chunks	TENDL	2008	2008	TALYS
+/opt/lab/data/libs/JEFF-31/neutron/chunks	JEFF	3.1	20050504	NEA
+/opt/lab/data/libs/JEFF-311/neutron/chunks	JEFF	3.1.1	200901  NEA
+/opt/lab/data/libs/CENDL-31/neutron/chunks	CENDL	3.1	2009	IAEA
+/opt/lab/data/libs/TENDL-2009/neutron/chunks	TENDL	2009	20091123	TALYS
+/opt/lab/data/libs/JENDL-40/neutron/chunks	JENDL	4.0	2010	JAEA
+/opt/lab/data/libs/ROSFOND-2010/neutron/chunks	ROSFOND 2010	2010	IAEA / issued in 2008-2010
+/opt/lab/data/libs/EAF-2010/neutron/chunks	EAF	2010	2010	IAEA
+/opt/lab/data/libs/TENDL-2010/neutron/chunks	TENDL	2010	20101208	TALYS
+/opt/lab/data/libs/ENDFB-71/neutron/chunks	ENDFB	7.1	201112  NEA
+/opt/lab/data/libs/TENDL-2011/neutron/chunks	TENDL	2011	20111229	TALYS
+/opt/lab/data/libs/JEFF-312/neutron/chunks	JEFF	3.1.2	201202	NEA
+/opt/lab/data/libs/TENDL-2012/neutron/chunks	TENDL	2012	20130111	TALYS
+/opt/lab/data/libs/TENDL-2013/neutron/chunks	TENDL	2013	20131220	TALYS
+/opt/lab/data/libs/JEFF-32/neutron/chunks	JEFF	3.2	20140305	NEA
+/opt/lab/data/libs/TENDL-2014/neutron/chunks	TENDL	2014	20141211	TALYS
+/opt/lab/data/libs/JENDL-40u/neutron/chunks	JENDL	4.0u	20160106	IAEA
+/opt/lab/data/libs/TENDL-2015/neutron/chunks	TENDL	2015	20160118	TENDL
+/opt/lab/data/libs/BROND-31/neutron/chunks	BROND	3.1	2016	IAEA
+/opt/lab/data/libs/JEFF-33/neutron/chunks	JEFF	3.3	201711	NEA
+/opt/lab/data/libs/TENDL-2017/neutron/chunks	TENDL	2017	20171230	TENDL
+/opt/lab/data/libs/ENDFB-80/neutron/chunks	ENDFB	8.0	20180202	GFORGE
