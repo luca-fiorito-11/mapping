@@ -18,7 +18,7 @@ MF, MFDES
 27, Atomic form factors or scattering functions for photo-atomic interactions
 28, Atomic relaxation data
 30, Data covariances obtained from parameter covariances and sensitivities
-31, Data covariances for nu(bar)
+31, Data covariances for nubar
 32, Data covariances for resonance parameters
 33, Data covariances for reaction cross sections
 34, Data covariances for angular distributions
