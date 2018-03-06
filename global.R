@@ -3,23 +3,37 @@
 # MAPPING app
 # Authors : F. Michel-Sendis & L. Fiorito
 #
-library(shiny)
-library(stringr)
+
+
 library(plotly)
-library(ggplot2)
-library(shinydashboard)
 library(shinythemes)
 library(shinyjs)
-library(VIM)
-library(rsconnect)
-library(reshape2)
-library(data.table)
 library(DT)
-library(dtplyr)
+library(data.table)
 library(dplyr)
-library(splitstackshape)
-library(rmarkdown)
 library(flexdashboard)
+library(knitr)
+
+#library(rmarkdown)
+#library(shiny)
+#library(ggplot2)
+#library(shinydashboard)
+#library(VIM)
+#library(dtplyr)
+#library(splitstackshape)
+#library(stringr)
+#library(rsconnect)
+#library(reshape2)
+
+# install packages if not already present : 
+# 
+# list.of.packages <- c("plotly", "shinythemes", "shinyjs",
+#                       "data.table", "DT", "dplyr", "flexdashboard")
+# 
+# new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+# if(length(new.packages)) install.packages(new.packages)
+
+
 
 # set environment variable to pass proxy
 #Sys.setenv(HTTPS_PROXY="http://proxy-vip1.oecd-nea.org:3128")
