@@ -90,6 +90,9 @@ lib$ACE<- paste0("<a href='ace/",lib$ACE,"' target='_blank'>",icon1,"</a>")
 lib$MAP<-paste0(lib$X, "-", lib$A,"-", lib$M,".html")
 lib$MAP <- paste0("<a href='map/",lib$MAP," ' target='_blank'>",icon2,"</a>")
 
+#adding decay data: 
+lib<-merge(x=lib, y=decay, by=c('Z', 'A', 'M'), all.x=TRUE)
+
 
 # for use by covariance counting :
  
@@ -168,33 +171,26 @@ Row
 
 ```{r table_diffs}
 
-lib2 <-data.table::fread(paste0(gpath,'JEFF33_vs_JEFF32.csv'), header = TRUE, sep = ",", stringsAsFactors = TRUE) %>% # RELATIVE PATH
-  subset(MT!=451) %>%  # REMOVE MF1MT451
+lib_diffs <-data.table::fread(paste0(gpath,'JEFF33_vs_JEFF32.csv'))%>%
+  subset(MT!=451)%>% 
   dplyr::group_by(MAT) %>% 
-  dplyr::summarize(NEW=all(VERORIG==3.3)) %>%
-  subset(NEW==TRUE) %>% # SET TO FALSE TO HAVE MATS THAT HAVE NOT CHANGED
-  merge(mats) # MERGE TO HAVE MASS, CHARGE, ETC
+  dplyr::summarize(UPDATED=!all(VERORIG==3.2)) %>% merge(mats)  
 
-lib2$SYMAM<-paste0(lib2$X,"-",lib2$A,"-",lib2$M)
+lib3<-merge(x=lib_diffs, y=lib, all.y=TRUE, by=c('Z','X', 'A', 'MAT','M'))%>%
+  subset(select=c('Z', 'SYMAM', 'UPDATED', 'HalfLife', 'MAP'))%>%
+  setnames(old=c('Z', 'SYMAM', 'UPDATED', 'HalfLife', 'MAP'),
+               new=c('Z', 'Isotope', 'Updated?', 'Half-Life', 'Map'))
 
-lib2<-subset(lib2, select=c('Z', 'SYMAM', 'NEW'))
-
-lib3<-merge(x=lib, y=lib2, all.x=TRUE) #, by="SYMAM")
-
-datatable(lib3, #filter='top', 
+datatable(lib3, filter='top', 
           #extensions = 'Buttons', 
           rownames=FALSE, escape=FALSE, 
           options = list(
-            #dom = 'Bfrtip', 
-            #buttons = list('copy', 'print', list(
-            #  extend = 'collection', buttons = c('csv', 'excel', 'pdf'),
-            #  text = 'Download')),
             pageLength=10,
             autowidth=TRUE, 
             order = list(0, 'asc'),
             columnDefs=list(
               list(width='10%', targets = 0),
-              list(className='dt-center', targets = 0:4)
+              list(className='dt-center', targets = 0:3)
             ))
     )
 ```
