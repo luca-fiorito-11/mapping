@@ -35,8 +35,36 @@ if(length(new.packages)) install.packages(new.packages)
 
 
 
-# set environment variable to pass proxy
+#set environment variable to pass proxy
 #Sys.setenv(HTTPS_PROXY="http://proxy-vip1.oecd-nea.org:3128")
+
+#customize rendering of plotly plots: 
+returnMyplotly <- function(p, xtitle="X title", ytitle="Y title"){
+  axisfont <- list(
+    family = "Helvetica",
+    size = 14,
+    color = "DarkGray"
+  )
+  yaxis=list(
+    titlefont= axisfont,
+    title = ytitle 
+    )
+  xaxis=list( 
+    titlefont= axisfont,
+    title = xtitle,
+    zeroline = FALSE,
+    showline = FALSE,
+    showticklabels = TRUE,
+    showgrid = TRUE
+  )
+
+  p<-p%>%config(displayModeBar = 'pan',showLink=FALSE,senddata=FALSE,editable=FALSE,
+           displaylogo=FALSE, collaborate=FALSE, cloud=FALSE,
+           modeBarButtonsToRemove=c('select2d', 'lasso2d','hoverClosestCartesian',
+                                    'hoverCompareCartesian'))%>%
+    layout(autosize = F,yaxis=yaxis,xaxis=xaxis,showlegend = TRUE)
+  return(p)
+}
 
 #user function for Half-Life display: 
 returnHumanReadableHalfLife <- function(seconds){
