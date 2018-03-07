@@ -80,10 +80,18 @@ VERS_ARRAY=($VERS_STRING)
 CHUNK="$1"
 CLIB="$2"
 CVER="$3"
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Remove name extension.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 NAME="$(basename $CHUNK)"
-MAT="$(echo $NAME | cut -c1-4 | sed 's/^0*//')"
-MF="$(echo $NAME | cut -c5-6 | sed 's/^0*//')"
-MT="$(echo $NAME | cut -c7-9 | sed 's/^0*//')"
+NAME="${NAME%.*}"
+Z=$(echo $NAME | awk -F "-" '{print $1}')
+SYM=$(echo $NAME | awk -F "-" '{print $2}')
+A=$(echo $NAME | awk -F "-" '{print $3}')
+M=$(echo $NAME | awk -F "-" '{print $4}')
+MF=$(echo $NAME | awk -F "-" '{print $5}')
+MT=$(echo $NAME | awk -F "-" '{print $6}')
+#MAT="$(echo $NAME | cut -c1-4 | sed 's/^0*//')"
 for i in $(seq 0 $((${#DIRS_ARRAY[@]}-1)))
 do
    OLD="${DIRS_ARRAY[$i]}/$(basename $CHUNK)"
@@ -92,7 +100,7 @@ do
       [[ -z $ZIP ]] && CMD="cmp" || CMD="zcmp"
       if $CMD --silent $OLD $CHUNK
       then
-         printf "%s,%s,%s,%s,%s,%s,%s\n" "$CLIB" "$CVER" "$MAT" "$MF" "$MT" "${LIBS_ARRAY[$i]}" "${VERS_ARRAY[$i]}"
+         printf "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" "$CLIB" "$CVER" "$Z" "$SYM" "$A" "$M" "$MF" "$MT" "${LIBS_ARRAY[$i]}" "${VERS_ARRAY[$i]}"
          break
       fi
    fi
@@ -215,6 +223,6 @@ PARALLEL="parallel --no-run-if-empty -j ${NJOBS-20} --linebuffer ${DRYRUN}"
 #                                                                     #
 #######################################################################
 #######################################################################
-[[ -z $NOHEADER ]] && printf "%s,%s,%s,%s,%s,%s,%s\n" "LIB" "VER" "MAT" "MF" "MT" "LIBORIG" "VERORIG" 
+[[ -z $NOHEADER ]] && printf "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" "LIB" "VER" "Z" "SYM" "A" "M" "MF" "MT" "LIBORIG" "VERORIG" 
 export -f mapping_foo
 $PARALLEL --colsep '[" "\t]+' mapping_foo {1} {2} {3} :::: "$CHUNKLIST"
