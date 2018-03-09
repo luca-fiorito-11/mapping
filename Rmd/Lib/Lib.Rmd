@@ -20,8 +20,8 @@ params:
 
  
 
-```{r setup}
-#knitr::opts_chunk$set(echo = FALSE, include= FALSE)
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE)
 
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 
@@ -94,17 +94,17 @@ lib$MAP <- paste0("<a href='map/",lib$MAP," ' target='_blank'>",icon2,"</a>")
 lib<-merge(x=lib, y=decay, by=c('Z', 'A', 'M'), all.x=TRUE)
 
 
-# for use by covariance counting :
- 
-df_cov <-df %>%subset(LIBVER==params$LIBVER & MF %in%(30:40))
-
-nEval<-nrow(unique(subset(df_cov, select="MAT"))) 
-
-breakdown_cov <- df_cov %>% 
-  plyr::count('LIBVERORIG') %>% 
-  transform(percent = scales::percent(freq / sum(freq)))
-
-breakdown_cov <- breakdown_cov[rev(order(breakdown_cov$LIBVERORIG)),]
+# # for use by covariance counting :
+#  
+# df_cov <-df %>%subset(LIBVER==params$LIBVER & MF %in%(30:40))
+# 
+# nEval<-nrow(unique(subset(df_cov, select="MAT"))) 
+# 
+# breakdown_cov <- df_cov %>% 
+#   plyr::count('LIBVERORIG') %>% 
+#   transform(percent = scales::percent(freq / sum(freq)))
+# 
+# breakdown_cov <- breakdown_cov[rev(order(breakdown_cov$LIBVERORIG)),]
 
 ```
 
@@ -121,46 +121,6 @@ NDEC
 htmltools::includeHTML("main.html")
 ```
 
-<!-- ### **Map to files**{data-width=200} -->
-
-
-<!-- ```{r lib_table} -->
-
-<!-- lib<-subset(lib, select=c("Z", "SYMAM", "MAT", "MAP")) -->
-<!-- libo<-lib -->
-<!-- #convert all data to factors : -->
-<!-- lib[] <- lapply(lib, factor) -->
-
-<!-- datatable(lib, #filter='top', -->
-<!--           rownames=FALSE, escape=FALSE, -->
-<!--           options = list(  -->
-<!--             pageLength=10, -->
-<!--             autowidth=TRUE, -->
-<!--             order = list(0, 'asc'), -->
-<!--             columnDefs=list( -->
-<!--               list(width='10%', targets = 0), -->
-<!--               list(className='dt-center', targets = 0:2) -->
-<!--             )) -->
-<!--     ) -->
-<!-- ``` -->
-
-  
-<!-- ### **Type and Origin of data sections**{data-width=400} -->
-
-<!-- ```{r plot_histo} -->
-
-<!-- g <- ggplot(df%>%subset(LIBVER==LIBVER), aes(MF)) + -->
-<!--   geom_bar(aes(fill=LIBVERORIG), width = 0.5) + -->
-<!--   coord_flip()+ -->
-<!--   scale_fill_manual(values=my_colors)+ -->
-<!--   theme_light() + -->
-<!--   theme(legend.title=element_blank(), -->
-<!--         plot.background=element_rect(fill="white"), -->
-<!--         plot.margin = unit(c(0.7, 0, 2, 1), "cm")) -->
-
-<!-- ggplotly(g) -->
-
-<!-- ``` -->
 
 Row
 ------
@@ -197,15 +157,57 @@ datatable(lib3, filter='top',
   
 
 
-<!-- df <-data.table::fread('csv/JEFF33_vs_JEFF32.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE) %>% # RELATIVE PATH -->
-<!--   subset(MT!=451) %>%  # REMOVE MF1MT451 -->
-<!--   dplyr::group_by(MAT) %>%  -->
-<!--   dplyr::summarize(NEW=all(VERORIG==3.3)) %>% -->
-<!--   subset(NEW==TRUE) %>% # SET TO FALSE TO HAVE MATS THAT HAVE NOT CHANGED -->
-<!--   merge(fread('csv/matzsymam.csv', header = TRUE, sep = ",", stringsAsFactors = TRUE)) # MERGE TO HAVE MASS, CHARGE, ETC -->
+```{r}
+selected_MF <-31
+```
 
-Covariances
-====
-   
-Other MF/MT Content
-====
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+
+```{r}
+selected_MF <-32
+```
+
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+
+```{r}
+selected_MF <-33
+```
+
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+
+```{r}
+selected_MF <-34
+```
+
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+
+```{r}
+selected_MF <-35
+```
+
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+
+```{r}
+selected_MF <-40
+```
+
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+ 

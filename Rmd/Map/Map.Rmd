@@ -29,8 +29,8 @@ font-size: 11px;
 
 </style>  
 
-```{r sourcing global.R}
-knitr::opts_chunk$set(echo = FALSE)
+```{r include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
 
 
 source("../../global.R")
