@@ -29,4 +29,5 @@
 /opt/lab/data/libs/BROND-31/neutron/chunks	BROND	3.1	2016	IAEA
 /opt/lab/data/libs/JEFF-33/neutron/chunks	JEFF	3.3	201711	NEA
 /opt/lab/data/libs/TENDL-2017/neutron/chunks	TENDL	2017	20171230	TENDL
+/opt/lab/data/libs/FENDL-31d/neutron/chunks	FENDL	3.1d	20180124	IAEA
 /opt/lab/data/libs/ENDFB-80/neutron/chunks	ENDFB	8.0	20180202	GFORGE
