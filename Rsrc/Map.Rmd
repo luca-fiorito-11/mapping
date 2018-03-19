@@ -1,0 +1,248 @@
+---
+title: "Nuclear Data Mapping"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    theme : sandstone #readable #spacelab
+    logo: www/logo.jpg
+    includes:
+      after_body: html/footer.html
+    #css: mystyles.css
+params:
+  X : "H"
+  A : 1
+  M : "g"
+  LIB : "JEFF"
+  VER : "3.3"
+  LIB2 : "JEFF"
+  VER2 : "3.2"
+  SDIR : "./"
+  
+---
+<style>                     
+.navbar {
+  background-color:white;
+  border-color:gray;
+}
+.navbar-brand {
+color:DarkSlateGray!important;
+}
+.dataTables_wrapper{
+font-family: helvetica;
+font-size: 11px; 
+}
+
+</style>  
+
+```{r setup, include=FALSE, cache = T}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
+source(paste0(params$SDIR, '/global.R'))
+
+#define parameters other than params 
+mLIBVER <- paste(params$LIB, params$VER, sep = "-")
+mLIBVER2 <- paste(params$LIB2, params$VER2, sep = "-")
+mSYMAM <- paste(params$X, params$A, params$M, sep = "-")
+
+#for use by datatables :
+pdf <- df %>% subset(X==params$X & A==params$A & M==params$M & LIB==params$LIB & VER==params$VER)
+tot <- dim(pdf)[1]
+
+# preparing datatables
+pdfo <- df %>% subset(X==params$X & A==params$A & M==params$M)
+lib2 <- pdfo %>% subset(LIB==params$LIB2 & VER==params$VER2,
+                        select = c('MFDES', 'MTDES', 'MF', 'MT', 'LIBVERORIG'))
+lib1 <- pdfo %>% subset(LIB==params$LIB & VER==params$VER,
+                        select = c('MFDES', 'MTDES', 'MF', 'MT', 'LIBVERORIG'))
+comp <- merge(lib1, lib2, by = c('MFDES', 'MTDES', 'MF', 'MT'), all=TRUE) %>%
+  data.table::setnames(old=c("LIBVERORIG.x","LIBVERORIG.y"), new=c("LIB1","LIB2")) %>%
+  data.table::setnames(old=c("MFDES","MTDES"), new=c("MF TYPE","MT TYPE")) %>%
+  arrange(MF, MT) # sort dataframe by MF (first) and MT
+
+#counting : 
+totalupdated <- dim( comp %>% subset(LIB1!=LIB2 & !is.na(LIB1) & !is.na(LIB2)) )[1]
+totunchanged <- dim( comp %>% subset(LIB1==LIB2) )[1]
+newinlib1 <- dim( comp %>% subset(is.na(LIB2)) )[1]
+erasedfromlib2 <- dim( comp %>% subset(is.na(LIB1)) )[1]
+
+comp[is.na(comp)] <- 'NA'
+
+if( totalupdated > 0 ) UpdatedColor <- "#b3ffb3" else UpdatedColor <-"Gray"
+if( newinlib1 > 0 ) NewColor <- "#b3ffb3" else NewColor <-"Gray"
+if( erasedfromlib2 > 0 ) ErasedColor <- "#ffb3b3" else ErasedColor <-"Gray"
+
+LIBLINK <-"https://www.oecd-nea.org/dbdata"
+```
+
+MF/MT Map
+================
+
+```{r child=paste0(params$SDIR, 'barheader_lib.Rmd')}
+```
+
+### MF-MT Origin {data-height=500}
+
+```{r plotmap}
+title <- paste(mSYMAM," from ", mLIBVER)
+
+axisfont <- list(
+  family = "Helvetica",
+  size = 14,
+  color = "blue"
+)
+    
+yaxis=list(titlefont= axisfont)
+xaxis=list(
+  titlefont= axisfont,
+  title = "MT",
+  zeroline = FALSE,
+  showline = FALSE,
+  showticklabels = TRUE,
+  showgrid = TRUE,
+  tickangle=80
+)
+    
+#changing column names for better readability in tooltip : 
+pdf %>% setnames(old=c("MFDES","MTDES", "LIBVERORIG"), new=c("Type","Reaction", "Matches"))
+g <- ggplot(pdf, aes(x=MT, y=MF, Type=Type, Reaction=Reaction, fill = Matches)) + 
+  geom_tile(color="white") +
+  scale_y_discrete(drop = FALSE) +
+  scale_fill_manual(values = my_colors) +
+  # theme_light() +
+  theme_minimal() +
+  # theme_classic() + 
+  theme(
+    legend.title = element_blank(),
+    panel.grid.major = element_line(linetype = "dashed"),
+    axis.line = element_line(size = 0.5, colour = "grey50"),
+    plot.background = element_rect(fill="white"), #can be 'darkseagreen' too...
+    plot.margin = unit(c(0.7, 0, 2, 1), "cm") #top, right, bottom, left
+    )
+p <- ggplotly(g, width = 1200, height = 500) %>%
+  config(
+    displayModeBar = 'pan',
+    showLink=FALSE,
+    senddata=FALSE,
+    editable=FALSE,
+    displaylogo=FALSE,
+    collaborate=FALSE,
+    cloud=FALSE,
+    modeBarButtonsToRemove=c('select2d', 'lasso2d','hoverClosestCartesian', 'hoverCompareCartesian')
+    ) %>%
+  layout(#title=title,
+    autosize = F,
+    yaxis=yaxis ,
+    xaxis=xaxis ,
+    showlegend = TRUE
+    )
+p
+#plotly_IMAGE(p, format = "png", out_file = "plotmap.png")
+```
+   
+Updated
+===========
+
+```{r child=paste0(params$SDIR, 'barheader_table.Rmd')}
+```
+
+### **Updated** 
+
+Origin of **updated** sections in `r mLIBVER` file,  with respect to reference : `r mLIBVER2`  
+
+```{r table_updated} 
+comp %>% subset(LIB1!=LIB2 & LIB1!="NA" & LIB2!="NA") %>% # diff occurrences
+  data.table::setnames(old=c("LIB1", "LIB2"), new=c(mLIBVER, mLIBVER2)) %>%
+  datatable(filter = 'top',
+            rownames = F,
+            options = list(
+              pageLength=10,
+              rownames=FALSE,
+              autowidth=FALSE,
+              #scrollY="1000vh",
+              columnDefs=list(list(className='dt-center', targets=0:5))
+              )
+            )
+```
+
+
+New
+===========
+
+```{r child=paste0(params$SDIR, 'barheader_table.Rmd')}
+```
+
+### New 
+
+Origin of **new** sections in `r mLIBVER` file,  with respect to reference : `r mLIBVER2`  
+
+```{r table_new} 
+comp %>% subset(LIB2=="NA") %>% # new in LIB1
+  data.table::setnames(old=c("LIB1","LIB2"), new=c(mLIBVER, mLIBVER2)) %>%
+  datatable(filter = 'top',
+            rownames = F,
+            options = list(
+              pageLength=10,
+              rownames=FALSE,
+              autowidth=FALSE,
+              #scrollY="1000vh",
+              columnDefs=list(list(className='dt-center', targets=0:5))
+              )
+            )
+```
+
+
+
+
+
+
+Unchanged
+===========
+
+```{r child=paste0(params$SDIR, 'barheader_table.Rmd')}
+```
+
+### **Unchanged**  
+
+Origin of **unchanged** sections in `r mLIBVER` file, with respect to reference : `r mLIBVER2` 
+
+```{r table_same} 
+comp %>% subset(LIB1==LIB2, select = c('MF TYPE', 'MT TYPE', 'MF', 'MT', 'LIB1')) %>% # same occurrences
+  data.table::setnames(old=c("LIB1"), new=c("Origin")) %>%
+  datatable(filter = 'top',
+            rownames = F,
+            options = list(
+              pageLength=10,
+              rownames=FALSE,
+              autowidth=FALSE,
+              #scrollY="1000vh",
+              columnDefs=list(list(className='dt-center', targets=0:4))
+              )
+            )
+```
+
+
+Erased
+===========
+
+```{r child=paste0(params$SDIR, 'barheader_table.Rmd')}
+```
+
+### **Erased** 
+
+Origin of **erased** sections in `r mLIBVER` file that were present in reference : `r mLIBVER2` 
+
+```{r table_erased} 
+comp %>% subset(LIB1=="NA") %>%
+data.table::setnames(old=c("LIB1","LIB2"), new=c(mLIBVER, mLIBVER2)) %>%
+datatable(filter = 'top',
+          rownames = F,
+          options = list(
+            pageLength=10,
+            rownames=FALSE,
+            autowidth=FALSE,
+            #scrollY="1000vh",
+            columnDefs=list(list(className='dt-center', targets=0:5))
+            )
+          )
+```
+
