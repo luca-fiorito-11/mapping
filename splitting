@@ -151,12 +151,11 @@ cd "$TMP" &&
 OLDIFS=$IFS
 IFS=
 ZSYMAM=$(sed -n 6p ENDFB.OUT | cut -c1-11)
-Z=$(echo $ZSYMAM | cut -c1-3 | tr -d " ")
-SYM=$(echo $ZSYMAM | cut -c5-6 | awk '{print tolower($0)}')
+Z=$(echo $ZSYMAM | cut -d"-" -f1 | tr -d " ")
+SYM=$(echo $ZSYMAM | cut -d"-" -f2 | tr -d " " | awk '{print tolower($0)}')
 SYM=$(echo ${SYM^} | tr -d " ")
-A=$(echo $ZSYMAM | cut -c8-10 | tr -d " ")
-M=$(echo $ZSYMAM | cut -c11 | awk '{print tolower($0)}' | tr -d " ")
-[[ -z $M ]] && M="g"
+A=$(echo $ZSYMAM | cut -d'-' -f3 | tr -d ' ')
+[[ ${A: -1} =~ [0-9] ]] && M="g" || { M=$(echo ${A: -1}|awk '{print tolower($0)}'); A=${A::-1}; }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # cpslit need IFS to be reset to default value.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
