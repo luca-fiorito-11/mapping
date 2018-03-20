@@ -11,8 +11,9 @@ flexdashboard::valueBox(mLIBVER, icon="fa-folder-open-o", href="https://www.oecd
 ### {data-width=160}
 
 ```{r } 
-flexdashboard::valueBox(mSYMAM, color="Gainsboro", caption = "Neutron File",  
-                        href="#map"
+flexdashboard::valueBox(paste(params$X,params$A,params$M,sep='-'),
+                        color="Gainsboro",
+                        caption = "Neutron File"
                         )
 
 ```   

@@ -35,7 +35,7 @@ font-size: 11px;
 
 </style>  
 
-```{r setup, include=FALSE, cache = T}
+```{r setup, include=FALSE, cache = F}
 knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
 source(paste0(params$SDIR, '/global.R'))
 
@@ -55,8 +55,14 @@ lib2 <- pdfo %>% subset(LIB==params$LIB2 & VER==params$VER2,
 lib1 <- pdfo %>% subset(LIB==params$LIB & VER==params$VER,
                         select = c('MFDES', 'MTDES', 'MF', 'MT', 'LIBVERORIG'))
 comp <- merge(lib1, lib2, by = c('MFDES', 'MTDES', 'MF', 'MT'), all=TRUE) %>%
-  data.table::setnames(old=c("LIBVERORIG.x","LIBVERORIG.y"), new=c("LIB1","LIB2")) %>%
-  data.table::setnames(old=c("MFDES","MTDES"), new=c("MF TYPE","MT TYPE")) %>%
+  data.table::setnames(
+    old=c("LIBVERORIG.x","LIBVERORIG.y"),
+    new=c("LIB1","LIB2")
+    ) %>%
+  data.table::setnames(
+    old=c("MFDES","MTDES"),
+    new=c("MF TYPE","MT TYPE")
+    ) %>%
   arrange(MF, MT) # sort dataframe by MF (first) and MT
 
 #counting : 
@@ -74,7 +80,7 @@ if( erasedfromlib2 > 0 ) ErasedColor <- "#ffb3b3" else ErasedColor <-"Gray"
 LIBLINK <-"https://www.oecd-nea.org/dbdata"
 ```
 
-MF/MT Map
+Map
 ================
 
 ```{r child=paste0(params$SDIR, 'barheader_lib.Rmd')}
@@ -151,7 +157,8 @@ Origin of **updated** sections in `r mLIBVER` file,  with respect to reference :
 
 ```{r table_updated} 
 comp %>% subset(LIB1!=LIB2 & LIB1!="NA" & LIB2!="NA") %>% # diff occurrences
-  data.table::setnames(old=c("LIB1", "LIB2"), new=c(mLIBVER, mLIBVER2)) %>%
+  data.table::setnames(old=c("LIB1", "LIB2"),
+                       new=c(paste0(mLIBVER,' matching'), paste0(mLIBVER2,' matching'))) %>%
   datatable(filter = 'top',
             rownames = F,
             options = list(
@@ -159,7 +166,7 @@ comp %>% subset(LIB1!=LIB2 & LIB1!="NA" & LIB2!="NA") %>% # diff occurrences
               rownames=FALSE,
               autowidth=FALSE,
               #scrollY="1000vh",
-              columnDefs=list(list(className='dt-center', targets=0:5))
+              columnDefs=list(list(className='dt-center', targets=1:5))
               )
             )
 ```
@@ -177,7 +184,7 @@ Origin of **new** sections in `r mLIBVER` file,  with respect to reference : `r 
 
 ```{r table_new} 
 comp %>% subset(LIB2=="NA") %>% # new in LIB1
-  data.table::setnames(old=c("LIB1","LIB2"), new=c(mLIBVER, mLIBVER2)) %>%
+  data.table::setnames(old=c("LIB1","LIB2"), new=c(paste0(mLIBVER,' matching'), paste0(mLIBVER2,' matching'))) %>%
   datatable(filter = 'top',
             rownames = F,
             options = list(
@@ -185,7 +192,7 @@ comp %>% subset(LIB2=="NA") %>% # new in LIB1
               rownames=FALSE,
               autowidth=FALSE,
               #scrollY="1000vh",
-              columnDefs=list(list(className='dt-center', targets=0:5))
+              columnDefs=list(list(className='dt-center', targets=1:5))
               )
             )
 ```
@@ -206,8 +213,9 @@ Unchanged
 Origin of **unchanged** sections in `r mLIBVER` file, with respect to reference : `r mLIBVER2` 
 
 ```{r table_same} 
-comp %>% subset(LIB1==LIB2, select = c('MF TYPE', 'MT TYPE', 'MF', 'MT', 'LIB1')) %>% # same occurrences
-  data.table::setnames(old=c("LIB1"), new=c("Origin")) %>%
+comp %>% subset(LIB1==LIB2) %>% # same occurrences
+  data.table::setnames(old=c("LIB1","LIB2"),
+                       new=c(paste0(mLIBVER,' matching'), paste0(mLIBVER2,' matching'))) %>%
   datatable(filter = 'top',
             rownames = F,
             options = list(
@@ -215,7 +223,7 @@ comp %>% subset(LIB1==LIB2, select = c('MF TYPE', 'MT TYPE', 'MF', 'MT', 'LIB1')
               rownames=FALSE,
               autowidth=FALSE,
               #scrollY="1000vh",
-              columnDefs=list(list(className='dt-center', targets=0:4))
+              columnDefs=list(list(className='dt-center', targets=1:5))
               )
             )
 ```
@@ -233,7 +241,8 @@ Origin of **erased** sections in `r mLIBVER` file that were present in reference
 
 ```{r table_erased} 
 comp %>% subset(LIB1=="NA") %>%
-data.table::setnames(old=c("LIB1","LIB2"), new=c(mLIBVER, mLIBVER2)) %>%
+data.table::setnames(old=c("LIB1","LIB2"),
+                     new=c(paste0(mLIBVER,' matching'), paste0(mLIBVER2,' matching'))) %>%
 datatable(filter = 'top',
           rownames = F,
           options = list(
@@ -241,7 +250,7 @@ datatable(filter = 'top',
             rownames=FALSE,
             autowidth=FALSE,
             #scrollY="1000vh",
-            columnDefs=list(list(className='dt-center', targets=0:5))
+            columnDefs=list(list(className='dt-center', targets=1:5))
             )
           )
 ```
