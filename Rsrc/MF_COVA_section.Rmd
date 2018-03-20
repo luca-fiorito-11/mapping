@@ -2,8 +2,8 @@
 MF`r selected_MF`
 =====================================
 ```{r}
-df_cov <- subset(df, LIB==params$LIB & VER==params$VER & MF==selected_MF)
-
+df_cov <- subset(df, LIB==params$LIB & VER==params$VER & MF==selected_MF) %>%
+  dplyr::arrange(Z, SYMA, M, MT)
 ```
 
 Row {data-height=200}
@@ -13,39 +13,44 @@ Row {data-height=200}
 
 MF `r selected_MF` : `r (mfs%>%subset(MF==selected_MF))$MFDES`. 
 
-Showing `r params$LIBVER` distribution of data for MF `r selected_MF`, with matching origins for each MF/MT section. 
+Showing `r paste(params$LIB,params$VER,sep='-')` distribution of data for MF `r selected_MF`, with matching origins for each MF/MT section. 
  
-### Evaluations with MF `r selected_MF` in `r params$LIBVER` {data-width=150}
+### Evaluations with MF `r selected_MF` in `r paste(params$LIB,params$VER,sep='-')` {data-width=200}
 ```{r}
 nEval <- dplyr::select(df_cov, Z, A, M) %>% unique() %>% nrow()
 nEvalTot <- df %>% subset(LIB==params$LIB & VER==params$VER, select=c(Z, A, M)) %>% unique() %>% nrow()
 gauge(nEval, min = 0, max = nEvalTot, gaugeSectors(success = c(0, 10)))
 ```
 
-### MF `r selected_MF` sections in `r params$LIBVER` {data-width=150}
-```{r}
-flexdashboard::valueBox(nrow(df_cov), icon = "fa-file")
+<!-- This info is already given in the datatable -->
+<!-- ### MF `r selected_MF` sections in `r paste(params$LIB,params$VER,sep='-')` {data-width=150} -->
+<!-- ```{r} -->
+<!-- flexdashboard::valueBox(nrow(df_cov), icon = "fa-file") -->
 
-```
+<!-- ``` -->
 
 Row  
 -------------------------------------
-### List of `r params$LIBVER` isotopes containing MF `r selected_MF` data {data-width=750}
+### List of `r paste(params$LIB,params$VER,sep='-')` isotopes containing MF `r selected_MF` data {data-width=750}
 ```{r}
 df_cov %>%
-  select(Z, A, M, MT, MTDES, LIBVERORIG) %>%
-  data.table::setnames(old=c("LIBVERORIG","MTDES"), new=c("Origin", "Type of data")) %>%
+  dplyr::select(Z, SYMA, M, MT, MTDES, LIBVERORIG) %>%
+  data.table::setnames(
+    old=c('Z','M',"SYMA","LIBVERORIG","MTDES"),
+    new=c('Atomic number','Isomeric state',"Isotope","Matching", "Type of data")
+    ) %>%
   DT::datatable(filter='top',
+                rownames=FALSE,
                 options = list(
                   pageLength=10,
-                  rownames=FALSE,
+                  lengthMenu=list(c(10, 50, 100, 200, 500, -1), list('10', '50', '100', '200', '500', 'All')),
                   autowidth=FALSE,
-                  columnDefs=list(list(className='dt-center', targets=0:2))
+                  columnDefs=list(list(className='dt-center', targets=c(0:3,5)))
                   )
                 )
 ```
 
-### Origin histogram of MF `r selected_MF` sections found in `r params$LIBVER` {data-width=400}
+### Origin histogram of MF `r selected_MF` sections found in `r paste(params$LIB,params$VER,sep='-')` {data-width=400}
 ```{r}
 g <- ggplot(df %>% subset(LIB==params$LIB & VER==params$VER & MF==selected_MF), 
            aes(x = LIBVERORIG)) +

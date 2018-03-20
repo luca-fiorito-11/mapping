@@ -97,7 +97,7 @@ mts<-fread(paste0(gpath,'MTs.csv'))
 mfs<-fread(paste0(gpath,'MF.csv'))  
 
 # dataframe coming from the mapping run
-df <- fread(paste0(gpath,'CHUNKS_JEFF33.csv'),
+df <- fread(paste0(gpath,'CHUNKS_JEFF.csv'),
             stringsAsFactors = T,
             colClasses=c("character", # LIB
                          "character", # VER

@@ -119,34 +119,74 @@ Row
 
 
 ```{r table_diffs}
-lib_diffs <- fread(paste0(gpath,'JEFF33_vs_JEFF32.csv')) %>%
-  subset(MT!=451) %>% 
-  dplyr::group_by(MAT) %>% 
-  dplyr::summarize(UPDATED=!all(VERORIG==3.2)) %>%
-  merge(mats) %>%
-  merge(y=lib,
-        all.y=TRUE,
-        by=c('Z', 'X', 'A','M')) %>%
-  subset(select=c('Z', 'SYMA', 'M', 'UPDATED', 'MAP')) %>%
-  setnames(
-    old=c('Z', 'SYMA', 'M', 'UPDATED', 'MAP'),
-    new=c('Z', 'Isotope', 'M', 'Updated?', 'Map')
+lib1 <- df %>% subset( LIB == params$LIB & VER == params$VER & MT != 451,
+                       select=c(Z, A, M, SYMA, MF, MT, LIBVERORIG))
+lib2 <- df %>% subset( LIB == params$LIB2 & VER == params$VER2 & MT != 451,
+                       select=c(Z, A, M, SYMA, MF, MT, LIBVERORIG))
+merge(lib1, lib2, by=c("Z","SYMA","M","MF","MT"), all=T) %>%
+  dplyr::mutate(eq=LIBVERORIG.x==LIBVERORIG.y) %>%
+  dplyr::mutate_at(vars("eq"), funs(if_else( is.na(.), F, .)) ) %>%
+  dplyr::group_by(Z,SYMA,M) %>%
+  dplyr::summarize(eq=all(eq)==T) %>%
+  dplyr::mutate(
+    # ENDF6 = paste(Z, SYMA, M, sep = "-") %>% paste0(".", tolower(LIB), gsub("[.]","",VER)), # Add ENDF-6 filename
+    # ACE = paste(Z, SYMA, M, sep = "-") %>% paste0(".", tolower(LIB), gsub("[.]","",VER), "-ACE"), # Add ACE filename
+    Map = paste(Z, SYMA, M, sep = "-") %>% paste0(".html") # Add mapping html file
     ) %>%
-  datatable(
+  dplyr::mutate(
+    # ENDF6 = paste0("<a href='endf6/", ENDF6, "' target='_blank'>", icon1, "</a>"),
+    # ACE = paste0("<a href='ace/", ACE, "' target='_blank'>", icon1, "</a>"),
+    Map = paste0("<a href='map/", Map, "' target='_blank'>", icon2, "</a>")
+    ) %>%
+  data.table::setnames(
+    old=c('Z','M','SYMA', 'eq'),
+    new=c('Atomic number','Isomeric state','Isotope', paste0(paste(params$LIB, params$VER, sep='-'),'==',paste(params$LIB2, params$VER2, sep='-')))
+    ) %>%
+  DT::datatable(
     filter='top', 
     #extensions = 'Buttons', 
     rownames=FALSE,
     escape=FALSE,
     options = list(
       pageLength=10,
+      lengthMenu=list(c(10, 50, 100, 200, 500, -1), list('10', '50', '100', '200', '500', 'All')),
       autowidth=TRUE,
       order = list(0, 'asc'),
       columnDefs=list(
         list(width='10%', targets = 0),
-        list(className='dt-center', targets = 0:3)
+        list(className='dt-center', targets = 0:4)
         )
       )
     )
+
+# lib_diffs <- fread(paste0(gpath,'JEFF33_vs_JEFF32.csv')) %>%
+#   subset(MT!=451) %>% 
+#   dplyr::group_by(MAT) %>% 
+#   dplyr::summarize(UPDATED=!all(VERORIG==3.2)) %>%
+#   merge(mats) %>%
+#   merge(y=lib,
+#         all.y=TRUE,
+#         by=c('Z', 'X', 'A','M')) %>%
+#   subset(select=c('Z', 'SYMA', 'M', 'UPDATED', 'MAP')) %>%
+#   setnames(
+#     old=c('Z', 'SYMA', 'M', 'UPDATED', 'MAP'),
+#     new=c('Z', 'Isotope', 'M', 'Updated?', 'Map')
+#     ) %>%
+#   datatable(
+#     filter='top', 
+#     #extensions = 'Buttons', 
+#     rownames=FALSE,
+#     escape=FALSE,
+#     options = list(
+#       pageLength=10,
+#       autowidth=TRUE,
+#       order = list(0, 'asc'),
+#       columnDefs=list(
+#         list(width='10%', targets = 0),
+#         list(className='dt-center', targets = 0:3)
+#         )
+#       )
+#     )
 ```
   
 
