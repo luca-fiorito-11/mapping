@@ -153,5 +153,6 @@ libdates <- fread(paste0(gpath,'libdate.csv'), header = TRUE, sep = ",", strings
 libdates$LIBVER<-paste(libdates$LIB,libdates$VER, sep="-")
 libdates<- setNames(as.character(libdates$YY), as.character(libdates$LIBVER))
 
-
+# save data in Rdata file
+save(df, mats, mfs, mts, decay, colors, my_colors, libdates, file='df.RData')
 
