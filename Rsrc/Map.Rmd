@@ -10,8 +10,8 @@ output:
       after_body: html/footer.html
     #css: mystyles.css
 params:
-  X : "H"
-  A : 1
+  X : "U"
+  A : 238
   M : "g"
   LIB : "JEFF"
   VER : "3.3"
