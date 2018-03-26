@@ -7,8 +7,8 @@ output:
     theme : sandstone #readable #spacelab
     logo: www/logo.jpg
     includes:
-      #before_body: ../../html/myNEAheader.html
-      #after_body: ../../html/myfooter.html
+      # before_body: ../../html/myNEAheader.html
+      # after_body: ../../html/myfooter.html
     css: www/styles.css
 params:
   LIB: "JEFF"
