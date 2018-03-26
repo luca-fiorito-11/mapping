@@ -4,6 +4,7 @@ MT,MTDES
 3,nonelastic
 4,total inelastic scattering
 5,anything
+10,total continuum
 11,"(n,2nd)"
 16,"(n,2n)"
 17,"(n,3n)"
@@ -21,7 +22,7 @@ MT,MTDES
 30,"(n,2n2a)"
 32,"(n,nd)"
 33,"(n,nt)"
-34,He)
+34,"(n,nHe3)"
 35,"(n,nd2a)"
 36,"(n,nt2a)"
 37,"(n,4n)"
@@ -30,53 +31,7 @@ MT,MTDES
 42,"(n,3np)"
 44,"(n,n2p)"
 45,"(n,npa)"
-91,inelastic scattering to continuum
-101,total absorption
-102,"(n,g)"
-103,"(n,p)"
-104,"(n,d)"
-105,"(n,t)"
-106,He)
-107,"(n,a)"
-108,"(n,2a)"
-109,"(n,3a)"
-111,"(n,2p)"
-112,"(n,pa)"
-113,"(n,t2a)"
-114,"(n,d2a)"
-115,"(n,pd)"
-116,"(n,pt)"
-117,"(n,da)"
-201,total neutron production
-202,total photon production
-203,total proton production
-204,total deuteron production
-205,total triton production
-206,He production
-207,total alpha production
-301,total heat production
-443,kinematic KERMA
-444,damage-energy production
-451,descriptive data and directory
-452,number of neutrons per fission
-454,fission product independent yield data
-455,delayed neutron data
-456,number of prompt neutrons per fission
-457,radioactive decay data
-458,components of energy release due to fission 
-459,fission product cumulative yield data
-600,"(n,p) to ground state"
-649,"(n,p) to continuum"
-650,"(n,d) to ground state"
-699,"(n,d) to continuum"
-700,"(n,t) to ground state"
-749,"(n,t) to continuum"
-750,He) to ground state
-799,He) to continuum
-800,"(n,a) to ground state"
-849,"(n,a) to continuum"
-875,"(n,2n) to ground state"
-891,"(n,2n) to continuum"
+50,inelastic scattering to ground state
 51,inelastic scattering to excited states
 52,inelastic scattering to excited states
 53,inelastic scattering to excited states
@@ -117,7 +72,43 @@ MT,MTDES
 88,inelastic scattering to excited states
 89,inelastic scattering to excited states
 90,inelastic scattering to excited states
-91,inelastic scattering to excited states
+91,inelastic scattering to continuum
+101,neutron disappearance
+102,"(n,g)"
+103,"(n,p)"
+104,"(n,d)"
+105,"(n,t)"
+106,"(n,He3)"
+107,"(n,a)"
+108,"(n,2a)"
+109,"(n,3a)"
+111,"(n,2p)"
+112,"(n,pa)"
+113,"(n,t2a)"
+114,"(n,d2a)"
+115,"(n,pd)"
+116,"(n,pt)"
+117,"(n,da)"
+151,resonance parameters
+201,total neutron production
+202,total photon production
+203,total proton production
+204,total deuteron production
+205,total triton production
+206,He3 production
+207,total alpha production
+301,total heat production
+443,kinematic KERMA
+444,damage-energy production
+451,descriptive data and directory
+452,total neutrons released per fission
+454,independent fission product yield data
+455,delayed neutrons released per fission
+456,prompt neutrons released per fission
+457,radioactive decay data
+458,components of energy release due to fission 
+459,cumulative fission product yield data
+600,"(n,p) to ground state"
 601,"(n,p) to excited states"
 602,"(n,p) to excited states"
 603,"(n,p) to excited states"
@@ -166,6 +157,8 @@ MT,MTDES
 646,"(n,p) to excited states"
 647,"(n,p) to excited states"
 648,"(n,p) to excited states"
+649,"(n,p) to continuum"
+650,"(n,d) to ground state"
 651,"(n,d) to excited states"
 652,"(n,d) to excited states"
 653,"(n,d) to excited states"
@@ -214,6 +207,8 @@ MT,MTDES
 696,"(n,d) to excited states"
 697,"(n,d) to excited states"
 698,"(n,d) to excited states"
+699,"(n,d) to continuum"
+700,"(n,t) to ground state"
 701,"(n,t) to excited states"
 702,"(n,t) to excited states"
 703,"(n,t) to excited states"
@@ -262,6 +257,58 @@ MT,MTDES
 746,"(n,t) to excited states"
 747,"(n,t) to excited states"
 748,"(n,t) to excited states"
+749,"(n,t) to continuum"
+750,"(n,He3) to ground state"
+751,"(n,He3) to excited states"
+752,"(n,He3) to excited states"
+753,"(n,He3) to excited states"
+754,"(n,He3) to excited states"
+755,"(n,He3) to excited states"
+756,"(n,He3) to excited states"
+757,"(n,He3) to excited states"
+758,"(n,He3) to excited states"
+759,"(n,He3) to excited states"
+760,"(n,He3) to excited states"
+761,"(n,He3) to excited states"
+762,"(n,He3) to excited states"
+763,"(n,He3) to excited states"
+764,"(n,He3) to excited states"
+765,"(n,He3) to excited states"
+766,"(n,He3) to excited states"
+767,"(n,He3) to excited states"
+768,"(n,He3) to excited states"
+769,"(n,He3) to excited states"
+770,"(n,He3) to excited states"
+771,"(n,He3) to excited states"
+772,"(n,He3) to excited states"
+773,"(n,He3) to excited states"
+774,"(n,He3) to excited states"
+775,"(n,He3) to excited states"
+776,"(n,He3) to excited states"
+777,"(n,He3) to excited states"
+778,"(n,He3) to excited states"
+779,"(n,He3) to excited states"
+780,"(n,He3) to excited states"
+781,"(n,He3) to excited states"
+782,"(n,He3) to excited states"
+783,"(n,He3) to excited states"
+784,"(n,He3) to excited states"
+785,"(n,He3) to excited states"
+786,"(n,He3) to excited states"
+787,"(n,He3) to excited states"
+788,"(n,He3) to excited states"
+789,"(n,He3) to excited states"
+790,"(n,He3) to excited states"
+791,"(n,He3) to excited states"
+792,"(n,He3) to excited states"
+793,"(n,He3) to excited states"
+794,"(n,He3) to excited states"
+795,"(n,He3) to excited states"
+796,"(n,He3) to excited states"
+797,"(n,He3) to excited states"
+798,"(n,He3) to excited states"
+799,"(n,He3) to continuum
+800,"(n,a) to ground state"
 801,"(n,a) to excited states"
 802,"(n,a) to excited states"
 803,"(n,a) to excited states"
@@ -310,6 +357,28 @@ MT,MTDES
 846,"(n,a) to excited states"
 847,"(n,a) to excited states"
 848,"(n,a) to excited states"
+849,"(n,a) to continuum"
+851,lumped reaction covariance
+852,lumped reaction covariance
+853,lumped reaction covariance
+854,lumped reaction covariance
+855,lumped reaction covariance
+856,lumped reaction covariance
+857,lumped reaction covariance
+858,lumped reaction covariance
+859,lumped reaction covariance
+860,lumped reaction covariance
+861,lumped reaction covariance
+862,lumped reaction covariance
+863,lumped reaction covariance
+864,lumped reaction covariance
+865,lumped reaction covariance
+866,lumped reaction covariance
+867,lumped reaction covariance
+868,lumped reaction covariance
+869,lumped reaction covariance
+870,lumped reaction covariance
+875,"(n,2n) to ground state"
 876,"(n,2n) to excited states"
 877,"(n,2n) to excited states"
 878,"(n,2n) to excited states"
@@ -325,51 +394,4 @@ MT,MTDES
 888,"(n,2n) to excited states"
 889,"(n,2n) to excited states"
 890,"(n,2n) to excited states"
-751,"(n,He) to excited states"
-752,"(n,He) to excited states"
-753,"(n,He) to excited states"
-754,"(n,He) to excited states"
-755,"(n,He) to excited states"
-756,"(n,He) to excited states"
-757,"(n,He) to excited states"
-758,"(n,He) to excited states"
-759,"(n,He) to excited states"
-760,"(n,He) to excited states"
-761,"(n,He) to excited states"
-762,"(n,He) to excited states"
-763,"(n,He) to excited states"
-764,"(n,He) to excited states"
-765,"(n,He) to excited states"
-766,"(n,He) to excited states"
-767,"(n,He) to excited states"
-768,"(n,He) to excited states"
-769,"(n,He) to excited states"
-770,"(n,He) to excited states"
-771,"(n,He) to excited states"
-772,"(n,He) to excited states"
-773,"(n,He) to excited states"
-774,"(n,He) to excited states"
-775,"(n,He) to excited states"
-776,"(n,He) to excited states"
-777,"(n,He) to excited states"
-778,"(n,He) to excited states"
-779,"(n,He) to excited states"
-780,"(n,He) to excited states"
-781,"(n,He) to excited states"
-782,"(n,He) to excited states"
-783,"(n,He) to excited states"
-784,"(n,He) to excited states"
-785,"(n,He) to excited states"
-786,"(n,He) to excited states"
-787,"(n,He) to excited states"
-788,"(n,He) to excited states"
-789,"(n,He) to excited states"
-790,"(n,He) to excited states"
-791,"(n,He) to excited states"
-792,"(n,He) to excited states"
-793,"(n,He) to excited states"
-794,"(n,He) to excited states"
-795,"(n,He) to excited states"
-796,"(n,He) to excited states"
-797,"(n,He) to excited states"
-798,"(n,He) to excited states"
+891,"(n,2n) to continuum"

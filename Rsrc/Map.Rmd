@@ -95,7 +95,7 @@ Map
 ```{r child=paste0(params$SDIR, 'barheader_lib.Rmd')}
 ```
 
-### MF-MT Origin {data-height=500}
+### MF/MT map {data-height=500}
 
 ```{r plotmap}
 title <- paste(mSYMAM," from ", mLIBVER)
@@ -160,10 +160,7 @@ Updated
 ```{r child=paste0(params$SDIR, 'barheader_table.Rmd')}
 ```
 
-### **Updated** 
-
-Origin of **updated** sections in `r mLIBVER` file,  with respect to reference : `r mLIBVER2`  
-
+### **Updated** sections in `r mLIBVER` file,  with respect to reference : `r mLIBVER2`  
 ```{r table_updated} 
 comp %>% subset(LIB1!=LIB2 & LIB1!="NA" & LIB2!="NA") %>% # diff occurrences
   data.table::setnames(old=c("LIB1", "LIB2"),
@@ -188,10 +185,7 @@ New
 ```{r child=paste0(params$SDIR, 'barheader_table.Rmd')}
 ```
 
-### New 
-
-Origin of **new** sections in `r mLIBVER` file,  with respect to reference : `r mLIBVER2`  
-
+### **New** sections in `r mLIBVER` file,  with respect to reference : `r mLIBVER2` 
 ```{r table_new} 
 comp %>% subset(LIB2=="NA") %>% # new in LIB1
   data.table::setnames(old=c("LIB1","LIB2"), new=c(paste0(mLIBVER,' matching'), paste0(mLIBVER2,' matching'))) %>%
@@ -219,10 +213,7 @@ Unchanged
 ```{r child=paste0(params$SDIR, 'barheader_table.Rmd')}
 ```
 
-### **Unchanged**  
-
-Origin of **unchanged** sections in `r mLIBVER` file, with respect to reference : `r mLIBVER2` 
-
+### **Unchanged** sections in `r mLIBVER` file, with respect to reference : `r mLIBVER2` 
 ```{r table_same} 
 comp %>% subset(LIB1==LIB2) %>% # same occurrences
   data.table::setnames(old=c("LIB1","LIB2"),
@@ -247,10 +238,7 @@ Erased
 ```{r child=paste0(params$SDIR, 'barheader_table.Rmd')}
 ```
 
-### **Erased** 
-
-Origin of **erased** sections in `r mLIBVER` file that were present in reference : `r mLIBVER2` 
-
+### **Erased** sections in `r mLIBVER` file that were present in reference : `r mLIBVER2`
 ```{r table_erased} 
 comp %>% subset(LIB1=="NA") %>%
 data.table::setnames(old=c("LIB1","LIB2"),
