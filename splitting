@@ -100,7 +100,8 @@ NAME="$( basename $FILE)"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 TWD="${TWD:-$(pwd)}"
 TWD="$(realpath $TWD)"
-[[ -d "$TWD" ]] ||  { >&2 echo -e "ERROR: no existing directory called '$TWD'"; exit 1; }
+mkdir -p "$TWD"
+#[[ -d "$TWD" ]] ||  { >&2 echo -e "ERROR: no existing directory called '$TWD'"; exit 1; }
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Set target working directory
 # Standardization and csplit is done in temporary folder
@@ -141,21 +142,37 @@ EXIT_STATUS=$?
 #                                                                     #
 #######################################################################
 #######################################################################
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-REGEX="^.\{74\}0.\{5\}$"
 {
 cd "$TMP" &&
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Extract ZSYMAM from 6th line of file.
+# Do lowercase correction, just in case...
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+OLDIFS=$IFS
+IFS=
+ZSYMAM=$(sed -n 6p ENDFB.OUT | cut -c1-11)
+Z=$(echo $ZSYMAM | cut -c1-3 | tr -d " ")
+SYM=$(echo $ZSYMAM | cut -c5-6 | awk '{print tolower($0)}')
+SYM=$(echo ${SYM^} | tr -d " ")
+A=$(echo $ZSYMAM | cut -c8-10 | tr -d " ")
+M=$(echo $ZSYMAM | cut -c11 | awk '{print tolower($0)}' | tr -d " ")
+[[ -z $M ]] && M="g"
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# cpslit need IFS to be reset to default value.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+IFS=$OLDIFS
+REGEX="^.\{74\}0.\{5\}$"
 csplit ENDFB.OUT /"${REGEX}"/ {*} --suppress-matched -z --prefix="${NAME}." --quiet
 for file in $(find . -maxdepth 1 -type f -name "${NAME}.*")
 do
    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    # The first line should always contain MAT/MF/MT because 
    # endf2c is run before
-   # In theory sed should never be called.
+   # Call chunk as Z-SYM-A-M-MF-MT
    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-   CHUNK="$(head -1 "$file" | cut -c67-75 | tr ' ' 0)"
-   [[ -z $CHUNK || ${#CHUNK} -ne 9 ]] && CHUNK="$(sed -n '2,2 p' "$file" | cut -c67-75 | tr ' ' 0)"
+   MF="$(head -1 "$file" | cut -c71-72 | tr -d ' ')"
+   MT="$(head -1 "$file" | cut -c73-75 | tr -d ' ')"
+   CHUNK=$Z-$SYM-$A-$M-$MF-$MT
    #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
    # Keep only the first 66 characters of each line.
    # Zip if requested.

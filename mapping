@@ -18,7 +18,7 @@
 # REVISION: ---
 #===============================================================================
 
-CODE=$(basename "$0")                                           # Executable name
+export CODE=$(basename "$0")                                           # Executable name
 SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"   # Directory of this script
 USAGE="Usage:
 
@@ -41,8 +41,74 @@ KEYWORD ARGUMENTS
 
 -z|--zip                    Perform comparison on zipped files using zcmp.
 
---xml-output                Produce xml output.
+-n|--max-jobs   N           Set the maximum number of jobs that will
+                            be run in parallel by GNU parallel
+                            (default is 20)
+
+--dryrun                    Show what commands will be run without running them.
 "
+
+
+
+#######################################################################
+#######################################################################
+#                                                                     #
+#                           FUNCTIONS                                 #
+#                                                                     #
+#######################################################################
+#######################################################################
+mapping_foo (){
+#=== FUNCTION =========================================================
+# NAME: mapping_foo
+# DESCRIPTION: Run NJOY calculation for a given ENDF-6 file using 
+#              "run-njoy" script.
+#              Use option --wdir to run the calculation in a subfolder
+#              with the same name as the basename of the ENDF-6 file.
+#              e.g. if the name of the file is "1-H-1g.jeff33", "run-njoy"
+#                   will be run in relative folder "./1-H-1g.jeff33/".
+#              Use option --aceonly only if set.
+#              Send stdout to /dev/null to avoid overlapping the stdout
+#              of different NJOY parallel runs.
+# PARAMETER 1: ENDF/6 file (absolute path)
+#======================================================================
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Reconvert exported strings DIRS, LIBS and VERS into arrays.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+DIRS_ARRAY=($DIRS_STRING)
+LIBS_ARRAY=($LIBS_STRING)
+VERS_ARRAY=($VERS_STRING)
+CHUNK="$1"
+CLIB="$2"
+CVER="$3"
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Remove name extension.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+NAME="$(basename $CHUNK)"
+NAME="${NAME%.*}"
+Z=$(echo $NAME | awk -F "-" '{print $1}')
+SYM=$(echo $NAME | awk -F "-" '{print $2}')
+A=$(echo $NAME | awk -F "-" '{print $3}')
+M=$(echo $NAME | awk -F "-" '{print $4}')
+MF=$(echo $NAME | awk -F "-" '{print $5}')
+MT=$(echo $NAME | awk -F "-" '{print $6}')
+#MAT="$(echo $NAME | cut -c1-4 | sed 's/^0*//')"
+for i in $(seq 0 $((${#DIRS_ARRAY[@]}-1)))
+do
+   OLD="${DIRS_ARRAY[$i]}/$(basename $CHUNK)"
+   if [[ -s $OLD ]]
+   then
+      [[ -z $ZIP ]] && CMD="cmp" || CMD="zcmp"
+      if $CMD --silent $OLD $CHUNK
+      then
+         printf "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" "$CLIB" "$CVER" "$Z" "$SYM" "$A" "$M" "$MF" "$MT" "${LIBS_ARRAY[$i]}" "${VERS_ARRAY[$i]}"
+         break
+      fi
+   fi
+done
+}
+
+function join_by { local IFS="$1"; shift; echo "$*"; }
+
 
 
 
@@ -63,13 +129,17 @@ case $key in
     exit 0
     ;;
     -z|--zip)
-    ZIP="--zip"
+    export ZIP="--zip"
     shift # past argument
     ;;
-    --xml-output)
-    XML="$2"
+    -n|--max-jobs)
+    NJOBS="$2"
     shift # past argument
     shift # past value
+    ;;
+    --dryrun)
+    DRYRUN="--dryrun"
+    shift # past argument
     ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
@@ -97,18 +167,15 @@ DIRLIST="${POSITIONAL[1]}"
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Get ENDF-6 chunks from file CHUNKLIST.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if [[ -d "$CHUNKLIST" ]]
-then
-   CHUNKLIST=($(find $(realpath "$CHUNKLIST") -maxdepth 1 -type f -o -type l))
-elif [[ -s "$CHUNKLIST" ]]
-then
-   CHUNKLIST=($(cat "$CHUNKLIST"))
-else
-   >&2 echo -e "ERROR: no file or directory called '$CHUNKLIST'"; exit 1
-fi
-[[ ${#CHUNKLIST[@]} -eq 0 ]] && {>&2 echo -e "ERROR: no ENDF-6 chunk file was given.";exit 1;}
-printf '%d chunk files given\n' "${#CHUNKLIST[@]}"
-for CHUNK in ${CHUNKLIST[@]}
+[[ -s "$CHUNKLIST" ]] || { >&2 echo -e "ERROR: no file called '$CHUNKLIST'"; exit 1; }
+CHUNKS=($( awk '/^[^\#]/ {print $1}' $CHUNKLIST ))
+CLIBS=($( awk '/^[^\#]/ {print $2}' $CHUNKLIST ))
+CVERS=($( awk '/^[^\#]/ {print $3}' $CHUNKLIST ))
+NCHUNKS=${#CHUNKS[@]}
+[[ $NCHUNKS -eq 0 ]] && {>&2 echo -e "ERROR: no ENDF-6 chunk file was given.";exit 1;}
+[[ $NCHUNKS -ne ${#CLIBS[@]} ]] && { >&2 echo -e "ERROR: first and second columns of file '$CHUNKLIST' have different length."; exit 1; }
+[[ $NCHUNKS -ne ${#CVERS[@]} ]] && { >&2 echo -e "ERROR: first and second columns of file '$CHUNKLIST' have different length."; exit 1; }
+for CHUNK in ${CHUNKS[@]}
 do
    [[ -s "$CHUNK" ]] || { >&2 echo -e "ERROR: empty or non-existing ENDF-6 chunk file '$CHUNK'"; exit 1; }
 done
@@ -117,16 +184,35 @@ done
 # Skip lines starting with # symbol.
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 [[ -s "$DIRLIST" ]] || { >&2 echo -e "ERROR: no file called '$DIRLIST'"; exit 1; }
-DIRS=($( awk '/^[^\#]/ {print $1}' $DIRLIST ))
-LIBS=($( awk '/^[^\#]/ {print $2}' $DIRLIST ))
-VERS=($( awk '/^[^\#]/ {print $3}' $DIRLIST ))
-NDIRS=${#DIRS[@]}
-for DIR in ${DIRS[@]}
+DIRS_ARRAY=($( awk '/^[^\#]/ {print $1}' $DIRLIST ))
+LIBS_ARRAY=($( awk '/^[^\#]/ {print $2}' $DIRLIST ))
+VERS_ARRAY=($( awk '/^[^\#]/ {print $3}' $DIRLIST ))
+NDIRS=${#DIRS_ARRAY[@]}
+[[ $NDIRS -eq 0 ]] && {>&2 echo -e "ERROR: no directory was given.";exit 1;}
+[[ $NDIRS -ne ${#LIBS_ARRAY[@]} ]] && { >&2 echo -e "ERROR: first and second columns of file '$DIRLIST' have different length."; exit 1; }
+[[ $NDIRS -ne ${#VERS_ARRAY[@]} ]] && { >&2 echo -e "ERROR: first and third columns of file '$DIRLIST' have different length."; exit 1; }
+for DIR in ${DIRS_ARRAY[@]}
 do
    [[ -d "$DIR" ]] || { >&2 echo -e "ERROR: no directory called '$DIR'"; exit 1; }
 done
-[[ $NDIRS -ne ${#LIBS[@]} ]] && { >&2 echo -e "ERROR: first and second columns of file '$DIRLIST' have different length."; exit 1; }
-[[ $NDIRS -ne ${#VERS[@]} ]] && { >&2 echo -e "ERROR: first and third columns of file '$DIRLIST' have different length."; exit 1; }
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# Reconvert arrays to strings since we cannot export arrays
+# in bash.
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+export DIRS_STRING=$(join_by " " ${DIRS_ARRAY[@]})
+export LIBS_STRING=$(join_by " " ${LIBS_ARRAY[@]})
+export VERS_STRING=$(join_by " " ${VERS_ARRAY[@]})
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# parallel is a shell tool for executing jobs in parallel.
+# OPTIONS:
+#   --no-run-if-empty: skip empty lines in input files
+#   -j $NJOBS: run a maximum of $NJOBS in parallel
+#   --joblog $JOBLOG: write logs in file $JOBLOG
+#   --linebuffer: do not postpone the stdout when
+#                 command completes
+#   --dryrun: show commands but do not run
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+PARALLEL="parallel --no-run-if-empty -j ${NJOBS-20} --linebuffer ${DRYRUN}"
 
 
 
@@ -137,32 +223,6 @@ done
 #                                                                     #
 #######################################################################
 #######################################################################
-[[ -z $XML ]] || printf "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" > "$XML"
-[[ -z $XML ]] || printf "<evals>\n" >> "$XML"
-printf "%10s  %10s  %10s  %10s  %10s  %10s  %10s\n" "LIBRARY" "VERSION" "MAT" "MF" "MT" "ORIGIN-LIB" "ORIGIN-VER" 
-for CHUNK in ${CHUNKLIST[@]}
-do
-   NAME="$(basename $CHUNK)"
-   MAT="$(echo $NAME | cut -c1-4 | sed 's/^0*//')"
-   MF="$(echo $NAME | cut -c5-6 | sed 's/^0*//')"
-   MT="$(echo $NAME | cut -c7-9 | sed 's/^0*//')"
-   for i in $(seq 0 $(($NDIRS-1)))
-   do
-      OLD="${DIRS[$i]}/$(basename $CHUNK)"
-      if [[ -s $OLD ]]
-      then
-         [[ -z $ZIP ]] && CMD="cmp" || CMD="zcmp"
-         $CMD --silent $OLD $CHUNK && { ORIGINLIB=${LIBS[$i]}; ORIGINVER=${VERS[$i]}; break; }
-      fi
-   done
-   [[ -z $XML ]] || printf "  <section>\n" >> "$XML"
-   [[ -z $XML ]] || printf "    <mat>%s</mat>\n" $MAT >> "$XML"
-   [[ -z $XML ]] || printf "    <mf>%s</mf>\n" $MF >> "$XML"
-   [[ -z $XML ]] || printf "    <mt>%s</mt>\n" $MT >> "$XML"
-   [[ -z $XML ]] || printf "    <origin-lib>%s</origin-lib>\n" $ORIGINLIB >> "$XML"
-   [[ -z $XML ]] || printf "    <origin-ver>%s</origin-ver>\n" $ORIGINVER >> "$XML"
-   [[ -z $XML ]] || printf "  </section>\n" >> "$XML"
-   printf "%10s, %10s, %10s, %10s, %10s, %10s, %10s\n" "JEFF" "3.3" "$MAT" "$MF" "$MT" "${ORIGINLIB}" "${ORIGINVER}"
-   unset ORIGINLIB ORIGINVER
-done
-[[ -z $XML ]] || printf "</evals>\n" >> "$XML"
+[[ -z $NOHEADER ]] && printf "%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n" "LIB" "VER" "Z" "SYM" "A" "M" "MF" "MT" "LIBORIG" "VERORIG" 
+export -f mapping_foo
+$PARALLEL --colsep '[" "\t]+' mapping_foo {1} {2} {3} :::: "$CHUNKLIST"

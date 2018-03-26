@@ -1,0 +1,61 @@
+#!/bin/bash
+#===============================================================================
+#
+# FILE: test-mapping
+#
+# USAGE: ./test_mapping
+#
+# DESCRIPTION: Run splitting and mapping scripts and check results consistency.
+#
+# OPTIONS: ---
+# REQUIREMENTS: ---
+# BUGS: ---
+# NOTES: ---
+# AUTHOR: Luca Fiorito, luca.fiorito@oecd.org
+# COMPANY: OECD/NEA
+# VERSION: ---
+# CREATED: 05.03.2018
+# REVISION: ---
+#===============================================================================
+
+CODE=$(basename "$0")                                           # Executable name
+SCRIPTDIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"   # Directory of this script
+
+mkdir -p TEST
+(cd TEST &&
+$SCRIPTDIR/splitting -t J32 "$SCRIPTDIR/data/files/n-83-Bi-209.jeff32"
+$SCRIPTDIR/splitting -t J32 "$SCRIPTDIR/data/files/n-96-Cm-249.jeff32"
+$SCRIPTDIR/splitting -t J33 "$SCRIPTDIR/data/files/83-Bi-209g.jeff33"
+$SCRIPTDIR/splitting -t J33 "$SCRIPTDIR/data/files/96-Cm-249g.jeff33"
+(
+find ./J33/ -type f | sort | awk {'print $0, "JEFF", 3.3'}
+) > chunklist
+(
+echo "$(pwd)/J32" JEFF 32
+echo "$(pwd)/J33" JEFF 33
+) > dirlist
+$SCRIPTDIR/mapping chunklist dirlist > test_mapping.out
+while read -r line
+do
+   grep -q "$line" "$SCRIPTDIR/data/test_mapping.out" || NOTFOUND=$((NOTFOUND + 1))
+done < test_mapping.out
+[[ -z $NOTFOUND ]] && echo "TEST 1 PASSED" ||  echo "TEST 1 NOT PASSED"
+
+$SCRIPTDIR/splitting -z -t J32z "$SCRIPTDIR/data/files/n-83-Bi-209.jeff32"
+$SCRIPTDIR/splitting -z -t J32z "$SCRIPTDIR/data/files/n-96-Cm-249.jeff32"
+$SCRIPTDIR/splitting -z -t J33z "$SCRIPTDIR/data/files/83-Bi-209g.jeff33"
+$SCRIPTDIR/splitting -z -t J33z "$SCRIPTDIR/data/files/96-Cm-249g.jeff33"
+(
+find ./J33z/ | sort | awk {'print $0, "JEFF", 3.3'}
+) > chunklist
+(
+echo "$(pwd)/J32z" JEFF 32
+echo "$(pwd)/J33z" JEFF 33
+) > dirlist
+$SCRIPTDIR/mapping -z -n 1 chunklist dirlist > test_mappingz.out
+while read -r line
+do
+   grep -q "$line" "$SCRIPTDIR/data/test_mapping.out" || NOTFOUND=$((NOTFOUND + 1))
+done < test_mapping.out
+[[ -z $NOTFOUND ]] && echo "TEST 2 PASSED" ||  echo "TEST 2 NOT PASSED"
+)
