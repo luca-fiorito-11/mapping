@@ -21,9 +21,18 @@ params:
  
 
 ```{r setup, include=FALSE}
+library(plotly)
+library(shinythemes)
+library(shinyjs)
+library(DT)
+library(data.table)
+library(dplyr)
+library(flexdashboard)
+library(knitr)
 knitr::opts_chunk$set(echo = FALSE, warning=FALSE)
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
-source(paste0(params$SDIR, '/global.R'))
+# source(paste0(params$SDIR, '/global.R'))
+load(paste0(params$SDIR, 'df.RData'))
 
 #define parameters other than params 
 mLIBVER <- paste(params$LIB, params$VER, sep = "-")

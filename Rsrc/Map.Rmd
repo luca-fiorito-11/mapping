@@ -36,8 +36,17 @@ font-size: 11px;
 </style>  
 
 ```{r setup, include=FALSE, cache = F}
+library(plotly)
+library(shinythemes)
+library(shinyjs)
+library(DT)
+library(data.table)
+library(dplyr)
+library(flexdashboard)
+library(knitr)
 knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
-source(paste0(params$SDIR, '/global.R'))
+# source(paste0(params$SDIR, '/global.R'))
+load(paste0(params$SDIR, 'df.RData'))
 
 #define parameters other than params 
 mLIBVER <- paste(params$LIB, params$VER, sep = "-")
