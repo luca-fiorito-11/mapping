@@ -1,0 +1,11 @@
+.navbar {
+  background-color:white;
+  border-color:gray;
+}
+.navbar-brand {
+color:DarkSlateGray!important;
+}
+.dataTables_wrapper{
+font-family: helvetica;
+font-size: 11px; 
+}

@@ -1,0 +1,207 @@
+---
+title: ""
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: rows
+    vertical_layout: scroll
+    theme : sandstone #readable #spacelab
+    logo: www/logo.jpg
+    includes:
+      # before_body: ../../html/myNEAheader.html
+      # after_body: ../../html/myfooter.html
+    css: www/styles.css
+params:
+  LIB: "JEFF"
+  VER: "3.3"
+  LIB2: "JEFF"
+  VER2: "3.2"
+  SDIR : "./"
+---
+
+ 
+
+```{r setup, include=FALSE}
+library(plotly)
+library(shinythemes)
+library(shinyjs)
+library(DT)
+library(data.table)
+library(dplyr)
+library(flexdashboard)
+library(knitr)
+knitr::opts_chunk$set(echo = FALSE, warning=FALSE)
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+# source(paste0(params$SDIR, '/global.R'))
+load(paste0(params$SDIR, 'df.RData'))
+
+#define parameters other than params 
+mLIBVER <- paste(params$LIB, params$VER, sep = "-")
+mLIBVER2 <- paste(params$LIB2, params$VER2, sep = "-")
+
+LIBLINK <-"https://www.oecd-nea.org/dbdata"
+
+# building columns in lib as html links : 
+icon1 <- "<i class='fa fa-download'></i>"
+icon2 <- "<i class='fa fa-sitemap'></i>"
+icon3 <- "<i class='fa fa-file-alt'></i>"
+icon4 <- "<i class='fa fa-file></i>"
+
+# total number of files
+totfiles <- df %>%
+  subset(LIB==params$LIB & VER==params$VER, select=c("Z", "A", "M", "LIB", "VER")) %>%
+  unique() %>%
+  nrow()
+
+#adding decay data: 
+# lib<-merge(x=lib, y=decay, by=c('Z', 'A', 'M'), all.x=TRUE) # For the moment we do not do it
+
+```
+
+
+NDEC
+====
+
+```{r child='barheader_libpage.Rmd'}
+```
+
+### **Access Files Individually**{data-width=500}
+
+```{r ndec_table}
+htmltools::includeHTML("main.html")
+```
+
+
+Row
+------
+
+
+### **List of modified files since previous release `r params$LIBVER2` **{data-width=600}
+
+
+```{r table_diffs}
+lib1 <- df %>% subset( LIB == params$LIB & VER == params$VER & MT != 451,
+                       select=c(Z, A, M, SYMA, MF, MT, LIBVERORIG))
+lib2 <- df %>% subset( LIB == params$LIB2 & VER == params$VER2 & MT != 451,
+                       select=c(Z, A, M, SYMA, MF, MT, LIBVERORIG))
+merge(lib1, lib2, by=c("Z","SYMA","M","MF","MT"), all=T) %>%
+  dplyr::mutate(eq=LIBVERORIG.x==LIBVERORIG.y) %>%
+  dplyr::mutate_at(vars("eq"), funs(if_else( is.na(.), F, .)) ) %>%
+  dplyr::group_by(Z,SYMA,M) %>%
+  dplyr::summarize(eq=all(eq)==T) %>%
+  dplyr::mutate(
+    # ENDF6 = paste(Z, SYMA, M, sep = "-") %>% paste0(".", tolower(LIB), gsub("[.]","",VER)), # Add ENDF-6 filename
+    # ACE = paste(Z, SYMA, M, sep = "-") %>% paste0(".", tolower(LIB), gsub("[.]","",VER), "-ACE"), # Add ACE filename
+    Map = paste(Z, SYMA, M, sep = "-") %>% paste0(".html") # Add mapping html file
+    ) %>%
+  dplyr::mutate(
+    # ENDF6 = paste0("<a href='endf6/", ENDF6, "' target='_blank'>", icon1, "</a>"),
+    # ACE = paste0("<a href='ace/", ACE, "' target='_blank'>", icon1, "</a>"),
+    Map = paste0("<a href='map/", Map, "' target='_blank'>", icon2, "</a>")
+    ) %>%
+  data.table::setnames(
+    old=c('Z','M','SYMA', 'eq'),
+    new=c('Atomic number','Isomeric state','Isotope', paste0(paste(params$LIB, params$VER, sep='-'),'==',paste(params$LIB2, params$VER2, sep='-')))
+    ) %>%
+  DT::datatable(
+    filter='top', 
+    #extensions = 'Buttons', 
+    rownames=FALSE,
+    escape=FALSE,
+    options = list(
+      pageLength=10,
+      lengthMenu=list(c(10, 50, 100, 200, 500, -1), list('10', '50', '100', '200', '500', 'All')),
+      autowidth=TRUE,
+      order = list(0, 'asc'),
+      columnDefs=list(
+        list(width='10%', targets = 0),
+        list(className='dt-center', targets = 0:4)
+        )
+      )
+    )
+
+# lib_diffs <- fread(paste0(gpath,'JEFF33_vs_JEFF32.csv')) %>%
+#   subset(MT!=451) %>% 
+#   dplyr::group_by(MAT) %>% 
+#   dplyr::summarize(UPDATED=!all(VERORIG==3.2)) %>%
+#   merge(mats) %>%
+#   merge(y=lib,
+#         all.y=TRUE,
+#         by=c('Z', 'X', 'A','M')) %>%
+#   subset(select=c('Z', 'SYMA', 'M', 'UPDATED', 'MAP')) %>%
+#   setnames(
+#     old=c('Z', 'SYMA', 'M', 'UPDATED', 'MAP'),
+#     new=c('Z', 'Isotope', 'M', 'Updated?', 'Map')
+#     ) %>%
+#   datatable(
+#     filter='top', 
+#     #extensions = 'Buttons', 
+#     rownames=FALSE,
+#     escape=FALSE,
+#     options = list(
+#       pageLength=10,
+#       autowidth=TRUE,
+#       order = list(0, 'asc'),
+#       columnDefs=list(
+#         list(width='10%', targets = 0),
+#         list(className='dt-center', targets = 0:3)
+#         )
+#       )
+#     )
+```
+  
+
+
+```{r}
+selected_MF <-31
+```
+
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+
+```{r}
+selected_MF <-32
+```
+
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+
+```{r}
+selected_MF <-33
+```
+
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+
+```{r}
+selected_MF <-34
+```
+
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+
+```{r}
+selected_MF <-35
+```
+
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+
+```{r}
+selected_MF <-40
+```
+
+
+```{r child='MF_COVA_section.Rmd'}
+```
+
+ 

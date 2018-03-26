@@ -1,0 +1,39 @@
+
+Row {}
+-------------------------------------
+
+### {data-width=200}
+```{r } 
+flexdashboard::valueBox(mLIBVER, icon="fa-folder-open-o", href=LIBLINK, color=as.character(my_colors[mLIBVER]), caption = paste(" Released in ", libdates[mLIBVER]))
+
+```   
+
+### {data-width=160}
+```{r } 
+flexdashboard::valueBox(mSYMAM, color="Gainsboro", caption = "Neutron File")
+
+```   
+
+
+### {data-width=128}
+```{r } 
+flexdashboard::valueBox(tot, color="Gainsboro", caption = "Sections in file")
+
+```   
+
+### {data-width=512}
+
+**Mapping** an ENDF-6 formatted file performs a one-to-one comparison of each MF/MT section present in the file to those of other nuclear data libraries.
+
+A **match** is found when two MF/MT sections in ASCII format are identical (line numbers are excluded):
+```{r, eval=F, echo=T} 
+cmp [MF/MT-FILE1] [MF/MT-FILE2] --> 0 bytes
+```
+
+The map reports the name of the earliest official release that matches the MF/MT section.
+
+
+
+Row {}
+-------------------------------------
+
