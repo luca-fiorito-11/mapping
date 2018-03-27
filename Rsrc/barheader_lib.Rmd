@@ -27,7 +27,7 @@ flexdashboard::valueBox(tot, color="Gainsboro", caption = "Sections in file")
 
 A **match** is found when two MF/MT sections in ASCII format are identical (line numbers are excluded):
 ```{r, eval=F, echo=T} 
-cmp [MF/MT-FILE1] [MF/MT-FILE2] --> 0 bytes
+cmp [MF/MT-FILE1] [MF/MT-FILE2] --> exit status 0
 ```
 
 The map reports the name of the earliest official release that matches the MF/MT section.
