@@ -100,7 +100,7 @@ merge(lib1, lib2, by=c("Z","SYMA","M","MF","MT"), all=T) %>%
     ) %>%
   data.table::setnames(
     old=c('Z','M','SYMA', 'eq'),
-    new=c('Atomic number','Isomeric state','Isotope', paste0(paste(params$LIB, params$VER, sep='-'),'==',paste(params$LIB2, params$VER2, sep='-')))
+    new=c('Atomic number','Isomeric state','Isotope', "Updated")
     ) %>%
   DT::datatable(
     filter='top', 
@@ -119,34 +119,7 @@ merge(lib1, lib2, by=c("Z","SYMA","M","MF","MT"), all=T) %>%
       )
     )
 
-# lib_diffs <- fread(paste0(gpath,'JEFF33_vs_JEFF32.csv')) %>%
-#   subset(MT!=451) %>% 
-#   dplyr::group_by(MAT) %>% 
-#   dplyr::summarize(UPDATED=!all(VERORIG==3.2)) %>%
-#   merge(mats) %>%
-#   merge(y=lib,
-#         all.y=TRUE,
-#         by=c('Z', 'X', 'A','M')) %>%
-#   subset(select=c('Z', 'SYMA', 'M', 'UPDATED', 'MAP')) %>%
-#   setnames(
-#     old=c('Z', 'SYMA', 'M', 'UPDATED', 'MAP'),
-#     new=c('Z', 'Isotope', 'M', 'Updated?', 'Map')
-#     ) %>%
-#   datatable(
-#     filter='top', 
-#     #extensions = 'Buttons', 
-#     rownames=FALSE,
-#     escape=FALSE,
-#     options = list(
-#       pageLength=10,
-#       autowidth=TRUE,
-#       order = list(0, 'asc'),
-#       columnDefs=list(
-#         list(width='10%', targets = 0),
-#         list(className='dt-center', targets = 0:3)
-#         )
-#       )
-#     )
+
 ```
   
 
