@@ -6,16 +6,16 @@ df_cov <- subset(df, LIB==params$LIB & VER==params$VER & MF==selected_MF) %>%
   dplyr::arrange(Z, SYMA, M, MT)
 ```
 
-Row {data-height=200}
+Row
 -------------------------------------
 
-### Description
+### Description{data-width=750}
 
 MF `r selected_MF` : `r (mfs%>%subset(MF==selected_MF))$MFDES`. 
 
 Showing `r paste(params$LIB,params$VER,sep='-')` distribution of data for MF `r selected_MF`, with matching origins for each MF/MT section. 
  
-### Evaluations with MF `r selected_MF` in `r paste(params$LIB,params$VER,sep='-')` {data-width=200}
+### Evaluations with MF `r selected_MF` in `r paste(params$LIB,params$VER,sep='-')` {data-width=250}
 ```{r}
 nEval <- dplyr::select(df_cov, Z, A, M) %>% unique() %>% nrow()
 nEvalTot <- df %>% subset(LIB==params$LIB & VER==params$VER, select=c(Z, A, M)) %>% unique() %>% nrow()
@@ -50,7 +50,7 @@ df_cov %>%
                 )
 ```
 
-### Origin histogram of MF `r selected_MF` sections found in `r paste(params$LIB,params$VER,sep='-')` {data-width=400}
+### Origin histogram of MF `r selected_MF` sections found in `r paste(params$LIB,params$VER,sep='-')` {data-width=250}
 ```{r}
 g <- ggplot(df %>% subset(LIB==params$LIB & VER==params$VER & MF==selected_MF), 
            aes(x = LIBVERORIG)) +

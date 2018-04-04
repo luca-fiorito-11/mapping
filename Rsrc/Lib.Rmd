@@ -38,7 +38,10 @@ load(paste0(params$SDIR, 'df.RData'))
 mLIBVER <- paste(params$LIB, params$VER, sep = "-")
 mLIBVER2 <- paste(params$LIB2, params$VER2, sep = "-")
 
+# for flexdashboard : 
 LIBLINK <-"https://www.oecd-nea.org/dbdata"
+libcolor="#cce6ff"  #color of lib value box in headers
+link_download="pathtosite"
 
 # building columns in lib as html links : 
 icon1 <- "<i class='fa fa-download'></i>"
@@ -64,18 +67,9 @@ NDEC
 ```{r child='barheader_libpage.Rmd'}
 ```
 
-### **Access Files Individually**{data-width=500}
-
-```{r ndec_table}
-htmltools::includeHTML("main.html")
-```
 
 
-Row
-------
-
-
-### **List of modified files since previous release `r params$LIBVER2` **{data-width=600}
+### **List of modified files since previous release `r params$LIBVER2` ** 
 
 
 ```{r table_diffs}
@@ -123,6 +117,18 @@ merge(lib1, lib2, by=c("Z","SYMA","M","MF","MT"), all=T) %>%
 ```
   
 
+
+Row
+------
+
+
+
+### **Access Files Individually** 
+
+```{r ndec_table}
+htmltools::includeHTML("main.html")
+```
+ 
 
 ```{r}
 selected_MF <-31

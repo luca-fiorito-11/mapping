@@ -4,13 +4,18 @@ Row {}
 
 ### {data-width=200}
 ```{r } 
-flexdashboard::valueBox(mLIBVER, icon="fa-folder-open-o", href=LIBLINK, color=as.character(my_colors[mLIBVER]), caption = paste(" Released in ", libdates[mLIBVER]))
+flexdashboard::valueBox(mLIBVER, 
+                        #icon="fa-folder-open-o", 
+                        #href=LIBLINK, 
+                        color=libcolor,
+                        #color=as.character(my_colors[mLIBVER]), 
+                        caption = paste(" Released in ", libdates[mLIBVER]))
 
 ```   
 
 ### {data-width=160}
 ```{r } 
-flexdashboard::valueBox(mSYMAM, color="Gainsboro", caption = "Neutron File")
+flexdashboard::valueBox(mSYMAM, color=libcolor, caption = "Neutron File")
 
 ```   
 

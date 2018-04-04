@@ -11,7 +11,7 @@ output:
     #css: mystyles.css
 params:
   X : "U"
-  A : 238
+  A : 233
   M : "g"
   LIB : "JEFF"
   VER : "3.3"
@@ -47,6 +47,10 @@ library(knitr)
 knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE)
 # source(paste0(params$SDIR, '/global.R'))
 load(paste0(params$SDIR, 'df.RData'))
+
+# for flexdashboard : 
+LIBLINK <-"https://www.oecd-nea.org/dbdata"
+libcolor="#cce6ff"  #color of lib value box in headers
 
 #define parameters other than params 
 mLIBVER <- paste(params$LIB, params$VER, sep = "-")
@@ -86,7 +90,8 @@ if( totalupdated > 0 ) UpdatedColor <- "#b3ffb3" else UpdatedColor <-"Gray"
 if( newinlib1 > 0 ) NewColor <- "#b3ffb3" else NewColor <-"Gray"
 if( erasedfromlib2 > 0 ) ErasedColor <- "#ffb3b3" else ErasedColor <-"Gray"
 
-LIBLINK <-"https://www.oecd-nea.org/dbdata"
+
+
 ```
 
 Map
