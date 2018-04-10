@@ -25,7 +25,7 @@ flexdashboard::valueBox(totfiles, color=libcolor, caption = "Neutron Files")
 
 The Joint Evaluated Fission and Fusion File (JEFF) is an evaluated library produced via an international collaboration of NEA Data Bank participating countries. 
 
-Access the [JEFF-3.3 download area](link_download) for all sublibraries. 
+Access the [JEFF-3.3 download area](http://www.oecd-nea.org/dbdata/JEFF33/) for all sublibraries. 
 
 Row {}
 -------------------------------------
